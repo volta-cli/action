@@ -1,10 +1,10 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Setup Volta environment'
+description: 'Setup a Volta environment and add it to the PATH'
+author: 'Robert Jackson <me@rwjblue.com>'
 inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+  #volta-version:
+  #  description: 'Version Spec of the version to use.  Examples: 0.6.x, 10.15.1, >=10.15.0'
+  #  default: '10.x'
 runs:
   using: 'node12'
   main: 'lib/main.js'
