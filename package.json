@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
+  "name": "setup-volta",
   "version": "0.0.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "Setup volta for usage in your CI runs",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/rwjblue/setup-volta.git"
   },
   "keywords": [
     "actions",
     "node",
     "setup"
   ],
-  "author": "YourNameOrOrganization",
+  "author": "Robert Jackson <me@rwjblue.com>",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.0.0"
