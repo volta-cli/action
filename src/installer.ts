@@ -63,7 +63,7 @@ export async function getVolta(versionSpec?: string): Promise<void> {
   }
 
   // If not found in cache, download
-  if (toolPath !== undefined) {
+  if (toolPath === undefined) {
     let version: string;
     const c = semver.clean(versionSpec) || '';
     // If explicit version
@@ -74,10 +74,8 @@ export async function getVolta(versionSpec?: string): Promise<void> {
       version = await getLatestVolta();
     }
 
-    if (!toolPath) {
-      // download, extract, cache
-      toolPath = await acquireVolta(version);
-    }
+    // download, extract, cache
+    toolPath = await acquireVolta(version);
   }
 
   // prepend the tools path. instructs the agent to prepend for future tasks
