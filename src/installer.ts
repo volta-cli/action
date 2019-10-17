@@ -22,7 +22,7 @@ async function acquireVolta(version: string): Promise<string> {
 
   let toolPath = tc.find('volta', version);
 
-  if (toolPath === undefined) {
+  if (toolPath === '') {
     console.log(`downloading volta@${version}`);
 
     let fileName: string;
