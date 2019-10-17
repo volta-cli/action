@@ -1,6 +1,3 @@
-// Load tempDirectory before it gets wiped by tool-cache
-let tempDirectory = process.env['RUNNER_TEMPDIRECTORY'] || '';
-
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
 import * as got from 'got';
@@ -9,21 +6,6 @@ import * as path from 'path';
 import * as semver from 'semver';
 
 const osPlat: string = os.platform();
-
-if (!tempDirectory) {
-  let baseLocation;
-  if (process.platform === 'win32') {
-    // On windows use the USERPROFILE env variable
-    baseLocation = process.env['USERPROFILE'] || 'C:\\';
-  } else {
-    if (process.platform === 'darwin') {
-      baseLocation = '/Users';
-    } else {
-      baseLocation = '/home';
-    }
-  }
-  tempDirectory = path.join(baseLocation, 'actions', 'temp');
-}
 
 async function getLatestVolta(): Promise<string> {
   const url = 'https://volta.sh/latest-version';
