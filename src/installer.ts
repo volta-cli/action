@@ -42,13 +42,12 @@ async function acquireVolta(version: string): Promise<string> {
   //
   // Extract
   //
-  const extPath = await tc.extractTar(downloadPath);
-  core.debug(`extracted tarball to '${extPath}'`);
+  const toolRoot = await tc.extractTar(downloadPath);
+  core.debug(`extracted tarball to '${toolRoot}'`);
 
   //
   // Install into the local tool cache - node extracts with a root folder that matches the fileName downloaded
   //
-  const toolRoot = path.join(extPath, fileName);
   core.debug(`caching '${toolRoot}'`);
 
   return await tc.cacheDir(toolRoot, 'volta', version);
