@@ -23,6 +23,37 @@ steps:
 - run: npm test
 ```
 
+Manually specifying node and/or yarn versions (e.g. to test a project without `volta` in `package.json`):
+
+```yaml
+steps:
+- uses: actions/checkout@v1
+- uses: rwjblue/setup-volta@v1
+  with:
+    node-version: 10.x
+    yarn-version: 1.19.1
+
+- run: yarn install
+- run: yarn test
+```
+
+Setting up a matrix of node versions:
+
+```yaml
+strategy:
+  matrix:
+    node-version: ['^8.12', '10', '12']
+
+steps:
+- uses: actions/checkout@v1
+- uses: rwjblue/setup-volta@v1
+  with:
+    node-version: ${{ matrix.node-version }}
+
+- run: npm install
+- run: npm test
+```
+
 # License
 
 The scripts and documentation in this project are released under the [MIT License](LICENSE)
