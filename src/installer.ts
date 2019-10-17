@@ -80,5 +80,6 @@ export async function getVolta(versionSpec: string): Promise<void> {
   // prepend the tools path. instructs the agent to prepend for future tasks
   if (toolPath !== undefined) {
     core.addPath(toolPath);
+    core.exportVariable('VOLTA_HOME', toolPath);
   }
 }
