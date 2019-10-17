@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
 import * as io from '@actions/io';
+import { exec } from '@actions/exec';
 import got from 'got';
 import * as os from 'os';
 import * as path from 'path';
@@ -86,6 +87,14 @@ async function acquireVolta(version: string): Promise<string> {
   }
 
   return toolPath;
+}
+
+export async function installNode(version: string): Promise<void> {
+  await exec('volta', ['install', `node${version === 'true' ? '' : `@${version}`}`]);
+}
+
+export async function installYarn(version: string): Promise<void> {
+  await exec('volta', ['install', `yarn${version === 'true' ? '' : `@${version}`}`]);
 }
 
 export async function getVolta(versionSpec: string): Promise<void> {
