@@ -1,6 +1,6 @@
 {
   "name": "setup-volta",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Setup volta for usage in your CI runs",
   "main": "lib/main.js",
