@@ -1,6 +1,6 @@
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
-import * as got from 'got';
+import got from 'got';
 import * as os from 'os';
 import * as path from 'path';
 import * as semver from 'semver';
