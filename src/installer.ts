@@ -6,6 +6,8 @@ import got from 'got';
 import * as os from 'os';
 import * as path from 'path';
 import * as semver from 'semver';
+import * as symlinkOrCopy from 'symlink-or-copy';
+import * as fs from 'fs';
 
 async function getLatestVolta(): Promise<string> {
   const url = 'https://volta.sh/latest-version';
@@ -34,6 +36,7 @@ export function buildDownloadUrl(platform: string, version: string): string {
 }
 
 export async function buildLayout(toolRoot: string): Promise<void> {
+  // TODO: remove in favor of `volta setup`
   // create the $VOLTA_HOME folder structure (volta doesn't create these
   // folders on demand, and errors when installing node/yarn/tools if it
   // isn't present)
@@ -52,6 +55,30 @@ export async function buildLayout(toolRoot: string): Promise<void> {
   await io.mkdirP(path.join(toolRoot, 'tools/inventory/packages'));
   await io.mkdirP(path.join(toolRoot, 'tools/inventory/yarn'));
   await io.mkdirP(path.join(toolRoot, 'tools/user'));
+}
+
+async function setupShim(toolRoot: string, name: string): Promise<void> {
+  const shimSource = path.join(toolRoot, 'shim');
+  const shimPath = path.join(toolRoot, 'bin', name);
+
+  symlinkOrCopy.sync(shimSource, shimPath);
+
+  // TODO: this is not portable to win32, confirm `volta setup` will take care
+  // of this for us
+  await fs.promises.chmod(shimPath, 0o755);
+}
+
+async function setupShims(toolRoot: string): Promise<void> {
+  // TODO: remove in favor of `volta setup`
+  // current volta installations (e.g 0.6.x) expect the common shims
+  // to be setup in $VOLTA_HOME/bin
+  //
+  // once https://github.com/volta-cli/volta/issues/564 lands, this can be
+  // removed in favor of calling `volta setup` directly
+  setupShim(toolRoot, 'node');
+  setupShim(toolRoot, 'yarn');
+  setupShim(toolRoot, 'npm');
+  setupShim(toolRoot, 'npx');
 }
 
 async function acquireVolta(version: string): Promise<string> {
@@ -76,6 +103,7 @@ async function acquireVolta(version: string): Promise<string> {
     core.debug(`extracted tarball to '${toolRoot}'`);
 
     await buildLayout(toolRoot);
+    await setupShims(toolRoot);
 
     //
     // Install into the local tool cache - node extracts with a root folder that matches the fileName downloaded
