@@ -1,5 +1,6 @@
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
+import * as io from '@actions/io';
 import got from 'got';
 import * as os from 'os';
 import * as path from 'path';
@@ -48,6 +49,25 @@ async function acquireVolta(version: string): Promise<string> {
     //
     const toolRoot = await tc.extractTar(downloadPath);
     core.debug(`extracted tarball to '${toolRoot}'`);
+
+    // create the $VOLTA_HOME folder structure (volta doesn't create these
+    // folders on demand, and errors when installing node/yarn/tools if it
+    // isn't present)
+    //
+    // once https://github.com/volta-cli/volta/issues/564 lands, this can be
+    // removed in favor of calling `volta setup` directly
+    await io.mkdirP(path.join(toolRoot, 'tmp'));
+    await io.mkdirP(path.join(toolRoot, 'bin'));
+    await io.mkdirP(path.join(toolRoot, 'cache/node'));
+    await io.mkdirP(path.join(toolRoot, 'log'));
+    await io.mkdirP(path.join(toolRoot, 'tmp'));
+    await io.mkdirP(path.join(toolRoot, 'tools/image/node'));
+    await io.mkdirP(path.join(toolRoot, 'tools/image/packages'));
+    await io.mkdirP(path.join(toolRoot, 'tools/image/yarn'));
+    await io.mkdirP(path.join(toolRoot, 'tools/inventory/node'));
+    await io.mkdirP(path.join(toolRoot, 'tools/inventory/packages'));
+    await io.mkdirP(path.join(toolRoot, 'tools/inventory/yarn'));
+    await io.mkdirP(path.join(toolRoot, 'tools/user'));
 
     //
     // Install into the local tool cache - node extracts with a root folder that matches the fileName downloaded
