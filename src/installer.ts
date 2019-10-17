@@ -62,7 +62,7 @@ async function acquireVolta(version: string): Promise<string> {
   let toolPath = tc.find('volta', version);
 
   if (toolPath === '') {
-    console.log(`downloading volta@${version}`);
+    core.info(`downloading volta@${version}`);
 
     const downloadUrl = buildDownloadUrl(os.platform(), version);
 
@@ -81,9 +81,9 @@ async function acquireVolta(version: string): Promise<string> {
     // Install into the local tool cache - node extracts with a root folder that matches the fileName downloaded
     //
     toolPath = await tc.cacheDir(toolRoot, 'volta', version);
-    console.log(`caching volta@${version}`);
+    core.info(`caching volta@${version}`);
   } else {
-    console.log(`using cached volta@${version}`);
+    core.info(`using cached volta@${version}`);
   }
 
   return toolPath;
