@@ -12,70 +12,65 @@ async function getLatestVolta(): Promise<string> {
 
   const response = await got(url);
 
-  return response.body;
+  return semver.clean(response.body);
 }
 
 async function acquireVolta(version: string): Promise<string> {
   //
   // Download - a tool installer intimately knows how to get the tool (and construct urls)
   //
-  version = semver.clean(version) || '';
 
-  let fileName: string;
-  switch (osPlat) {
-    case 'darwin':
-      fileName = `volta-${version}-macos.tar.gz`;
-      break;
-    case 'linux':
-      fileName = `volta-${version}-linux-openssl-1.1.tar.gz`;
-      break;
-    case 'win32':
-      throw new Error('windows is not yet supported');
-    default:
-      throw new Error(`your platform ${osPlat} is not yet supported`);
+  let toolPath = tc.find('volta', version);
+
+  if (toolPath === undefined) {
+    console.log(`downloading volta@${version}`);
+
+    let fileName: string;
+    switch (osPlat) {
+      case 'darwin':
+        fileName = `volta-${version}-macos.tar.gz`;
+        break;
+      case 'linux':
+        fileName = `volta-${version}-linux-openssl-1.1.tar.gz`;
+        break;
+      case 'win32':
+        throw new Error('windows is not yet supported');
+      default:
+        throw new Error(`your platform ${osPlat} is not yet supported`);
+    }
+
+    const downloadUrl = `https://github.com/volta-cli/volta/releases/download/v${version}/${fileName}`;
+    core.debug(`downloading from \`${downloadUrl}\``);
+    const downloadPath = await tc.downloadTool(downloadUrl);
+
+    //
+    // Extract
+    //
+    const toolRoot = await tc.extractTar(downloadPath);
+    core.debug(`extracted tarball to '${toolRoot}'`);
+
+    //
+    // Install into the local tool cache - node extracts with a root folder that matches the fileName downloaded
+    //
+    toolPath = await tc.cacheDir(toolRoot, 'volta', version);
+    console.log(`caching volta@${version}`);
+  } else {
+    console.log(`using cached volta@${version}`);
   }
 
-  const downloadUrl = `https://github.com/volta-cli/volta/releases/download/v${version}/${fileName}`;
-  core.debug(`downloading from \`${downloadUrl}\``);
-  const downloadPath = await tc.downloadTool(downloadUrl);
-
-  //
-  // Extract
-  //
-  const toolRoot = await tc.extractTar(downloadPath);
-  core.debug(`extracted tarball to '${toolRoot}'`);
-
-  //
-  // Install into the local tool cache - node extracts with a root folder that matches the fileName downloaded
-  //
-  core.debug(`caching '${toolRoot}'`);
-
-  return await tc.cacheDir(toolRoot, 'volta', version);
+  return toolPath;
 }
 
 export async function getVolta(versionSpec: string): Promise<void> {
-  // check cache
-  let toolPath: undefined | string;
+  let version = semver.clean(versionSpec) || '';
 
-  if (versionSpec !== '') {
-    toolPath = tc.find('volta', versionSpec);
+  // If explicit version
+  if (semver.valid(version) === null) {
+    version = await getLatestVolta();
   }
 
-  // If not found in cache, download
-  if (toolPath === undefined) {
-    let version: string;
-    const c = semver.clean(versionSpec) || '';
-    // If explicit version
-    if (versionSpec !== '' && semver.valid(c) != null) {
-      // version to download
-      version = versionSpec;
-    } else {
-      version = await getLatestVolta();
-    }
-
-    // download, extract, cache
-    toolPath = await acquireVolta(version);
-  }
+  // download, extract, cache
+  const toolPath = await acquireVolta(version);
 
   // prepend the tools path. instructs the agent to prepend for future tasks
   if (toolPath !== undefined) {
