@@ -6,14 +6,51 @@ import * as os from 'os';
 import * as path from 'path';
 import * as semver from 'semver';
 
-const osPlat: string = os.platform();
-
 async function getLatestVolta(): Promise<string> {
   const url = 'https://volta.sh/latest-version';
 
   const response = await got(url);
 
   return semver.clean(response.body);
+}
+
+export function buildDownloadUrl(platform: string, version: string): string {
+  let fileName: string;
+  switch (platform) {
+    case 'darwin':
+      fileName = `volta-${version}-macos.tar.gz`;
+      break;
+    case 'linux':
+      fileName = `volta-${version}-linux-openssl-1.1.tar.gz`;
+      break;
+    case 'win32':
+      throw new Error('windows is not yet supported');
+    default:
+      throw new Error(`your platform ${platform} is not yet supported`);
+  }
+
+  return `https://github.com/volta-cli/volta/releases/download/v${version}/${fileName}`;
+}
+
+export async function buildLayout(toolRoot: string): Promise<void> {
+  // create the $VOLTA_HOME folder structure (volta doesn't create these
+  // folders on demand, and errors when installing node/yarn/tools if it
+  // isn't present)
+  //
+  // once https://github.com/volta-cli/volta/issues/564 lands, this can be
+  // removed in favor of calling `volta setup` directly
+  await io.mkdirP(path.join(toolRoot, 'tmp'));
+  await io.mkdirP(path.join(toolRoot, 'bin'));
+  await io.mkdirP(path.join(toolRoot, 'cache/node'));
+  await io.mkdirP(path.join(toolRoot, 'log'));
+  await io.mkdirP(path.join(toolRoot, 'tmp'));
+  await io.mkdirP(path.join(toolRoot, 'tools/image/node'));
+  await io.mkdirP(path.join(toolRoot, 'tools/image/packages'));
+  await io.mkdirP(path.join(toolRoot, 'tools/image/yarn'));
+  await io.mkdirP(path.join(toolRoot, 'tools/inventory/node'));
+  await io.mkdirP(path.join(toolRoot, 'tools/inventory/packages'));
+  await io.mkdirP(path.join(toolRoot, 'tools/inventory/yarn'));
+  await io.mkdirP(path.join(toolRoot, 'tools/user'));
 }
 
 async function acquireVolta(version: string): Promise<string> {
@@ -26,21 +63,8 @@ async function acquireVolta(version: string): Promise<string> {
   if (toolPath === '') {
     console.log(`downloading volta@${version}`);
 
-    let fileName: string;
-    switch (osPlat) {
-      case 'darwin':
-        fileName = `volta-${version}-macos.tar.gz`;
-        break;
-      case 'linux':
-        fileName = `volta-${version}-linux-openssl-1.1.tar.gz`;
-        break;
-      case 'win32':
-        throw new Error('windows is not yet supported');
-      default:
-        throw new Error(`your platform ${osPlat} is not yet supported`);
-    }
+    const downloadUrl = buildDownloadUrl(os.platform(), version);
 
-    const downloadUrl = `https://github.com/volta-cli/volta/releases/download/v${version}/${fileName}`;
     core.debug(`downloading from \`${downloadUrl}\``);
     const downloadPath = await tc.downloadTool(downloadUrl);
 
@@ -50,24 +74,7 @@ async function acquireVolta(version: string): Promise<string> {
     const toolRoot = await tc.extractTar(downloadPath);
     core.debug(`extracted tarball to '${toolRoot}'`);
 
-    // create the $VOLTA_HOME folder structure (volta doesn't create these
-    // folders on demand, and errors when installing node/yarn/tools if it
-    // isn't present)
-    //
-    // once https://github.com/volta-cli/volta/issues/564 lands, this can be
-    // removed in favor of calling `volta setup` directly
-    await io.mkdirP(path.join(toolRoot, 'tmp'));
-    await io.mkdirP(path.join(toolRoot, 'bin'));
-    await io.mkdirP(path.join(toolRoot, 'cache/node'));
-    await io.mkdirP(path.join(toolRoot, 'log'));
-    await io.mkdirP(path.join(toolRoot, 'tmp'));
-    await io.mkdirP(path.join(toolRoot, 'tools/image/node'));
-    await io.mkdirP(path.join(toolRoot, 'tools/image/packages'));
-    await io.mkdirP(path.join(toolRoot, 'tools/image/yarn'));
-    await io.mkdirP(path.join(toolRoot, 'tools/inventory/node'));
-    await io.mkdirP(path.join(toolRoot, 'tools/inventory/packages'));
-    await io.mkdirP(path.join(toolRoot, 'tools/inventory/yarn'));
-    await io.mkdirP(path.join(toolRoot, 'tools/user'));
+    await buildLayout(toolRoot);
 
     //
     // Install into the local tool cache - node extracts with a root folder that matches the fileName downloaded
