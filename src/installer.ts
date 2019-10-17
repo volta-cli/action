@@ -36,17 +36,21 @@ async function acquireVolta(version: string): Promise<string> {
   }
 
   const downloadUrl = `https://github.com/volta-cli/volta/releases/download/v${version}/${fileName}`;
+  core.debug(`downloading from \`${downloadUrl}\``);
   const downloadPath = await tc.downloadTool(downloadUrl);
 
   //
   // Extract
   //
   const extPath = await tc.extractTar(downloadPath);
+  core.debug(`extracted tarball to '${extPath}'`);
 
   //
   // Install into the local tool cache - node extracts with a root folder that matches the fileName downloaded
   //
   const toolRoot = path.join(extPath, fileName);
+  core.debug(`caching '${toolRoot}'`);
+
   return await tc.cacheDir(toolRoot, 'volta', version);
 }
 
