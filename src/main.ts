@@ -4,9 +4,8 @@ import * as installer from './installer';
 async function run(): Promise<void> {
   try {
     const version = core.getInput('volta-version');
-    if (version) {
-      await installer.getVolta(version);
-    }
+
+    await installer.getVolta(version);
   } catch (error) {
     core.setFailed(error.message);
   }
