@@ -17,4 +17,5 @@ jobs:
     - run: npm run build
     - run: npm test
     - uses: ./
-    - run: volta version
+    - run: volta --version
+    - run: volta install node yarn
