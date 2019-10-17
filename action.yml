@@ -4,6 +4,7 @@ author: 'Robert Jackson <me@rwjblue.com>'
 inputs:
   volta-version:
     description: 'Version Spec of the version to use.  Examples: 0.6.x, 10.15.1, >=10.15.0'
+    default: ''
 runs:
   using: 'node12'
   main: 'lib/main.js'

@@ -54,11 +54,11 @@ async function acquireVolta(version: string): Promise<string> {
   return await tc.cacheDir(toolRoot, 'volta', version);
 }
 
-export async function getVolta(versionSpec?: string): Promise<void> {
+export async function getVolta(versionSpec: string): Promise<void> {
   // check cache
   let toolPath: undefined | string;
 
-  if (versionSpec !== undefined) {
+  if (versionSpec !== '') {
     toolPath = tc.find('volta', versionSpec);
   }
 
@@ -67,7 +67,7 @@ export async function getVolta(versionSpec?: string): Promise<void> {
     let version: string;
     const c = semver.clean(versionSpec) || '';
     // If explicit version
-    if (versionSpec !== undefined && semver.valid(c) != null) {
+    if (versionSpec !== '' && semver.valid(c) != null) {
       // version to download
       version = versionSpec;
     } else {
