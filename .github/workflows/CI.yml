@@ -17,3 +17,4 @@ jobs:
     - run: npm run build
     - run: npm test
     - uses: ./
+    - run: volta version
