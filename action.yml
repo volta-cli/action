@@ -2,9 +2,8 @@ name: 'Setup Volta environment'
 description: 'Setup a Volta environment and add it to the PATH'
 author: 'Robert Jackson <me@rwjblue.com>'
 inputs:
-  #volta-version:
-  #  description: 'Version Spec of the version to use.  Examples: 0.6.x, 10.15.1, >=10.15.0'
-  #  default: '10.x'
+  volta-version:
+    description: 'Version Spec of the version to use.  Examples: 0.6.x, 10.15.1, >=10.15.0'
 runs:
   using: 'node12'
   main: 'lib/main.js'

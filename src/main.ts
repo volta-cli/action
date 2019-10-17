@@ -1,16 +1,12 @@
 import * as core from '@actions/core';
-import { wait } from './wait';
+import * as installer from './installer';
 
 async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    console.log(`Waiting ${ms} milliseconds ...`);
-
-    core.debug(new Date().toTimeString());
-    await wait(parseInt(ms, 10));
-    core.debug(new Date().toTimeString());
-
-    core.setOutput('time', new Date().toTimeString());
+    const version = core.getInput('volta-version');
+    if (version) {
+      await installer.getVolta(version);
+    }
   } catch (error) {
     core.setFailed(error.message);
   }
