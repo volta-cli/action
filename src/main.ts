@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as installer from './installer';
 
-async function run() {
+async function run(): Promise<void> {
   try {
     const version = core.getInput('volta-version');
     if (version) {
