@@ -17,6 +17,27 @@ jobs:
     - run: npm run build
     - run: npm test
 
+  test-volta-0-6:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+
+    - run: npm ci
+    - run: npm run build
+    - uses: ./
+      with:
+        volta-version: 0.6.3
+
+    - run: volta --version
+    - run: volta install node@10 yarn
+    - run: node --version
+    - run: which node
+    - run: volta which node
+    - run: yarn --version
+    - run: which yarn
+    - run: volta which yarn
+
+
   test-no-options:
     runs-on: ubuntu-latest
     steps:
@@ -43,7 +64,7 @@ jobs:
     - run: npm run build
     - uses: ./
       with:
-        volta-version: 0.6.3
+        volta-version: 0.7.2
 
     - run: volta --version
     - run: volta install node@10 yarn
@@ -63,8 +84,8 @@ jobs:
     - run: npm run build
     - uses: ./
       with:
-        volta-version: 0.6.3
-        node-version: 10
+        volta-version: 0.7.2
+        node-version: 12
         yarn-version: 1.22
 
     - run: volta --version
