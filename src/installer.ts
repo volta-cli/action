@@ -39,14 +39,13 @@ export function buildDownloadUrl(platform: string, version: string): string {
   return `https://github.com/volta-cli/volta/releases/download/v${version}/${fileName}`;
 }
 
+/*
+ * Used to build the required folder structure when installing volta < 0.7
+ */
 export async function buildLayout(toolRoot: string): Promise<void> {
-  // TODO: remove in favor of `volta setup`
   // create the $VOLTA_HOME folder structure (volta doesn't create these
   // folders on demand, and errors when installing node/yarn/tools if it
   // isn't present)
-  //
-  // once https://github.com/volta-cli/volta/issues/564 lands, this can be
-  // removed in favor of calling `volta setup` directly
   await io.mkdirP(path.join(toolRoot, 'tmp'));
   await io.mkdirP(path.join(toolRoot, 'bin'));
   await io.mkdirP(path.join(toolRoot, 'cache/node'));
@@ -61,6 +60,9 @@ export async function buildLayout(toolRoot: string): Promise<void> {
   await io.mkdirP(path.join(toolRoot, 'tools/user'));
 }
 
+/*
+ * Used to setup a specific shim when running volta < 0.7
+ */
 async function setupShim(toolRoot: string, name: string): Promise<void> {
   const shimSource = path.join(toolRoot, 'shim');
   const shimPath = path.join(toolRoot, 'bin', name);
@@ -72,13 +74,12 @@ async function setupShim(toolRoot: string, name: string): Promise<void> {
   await fs.promises.chmod(shimPath, 0o755);
 }
 
+/*
+ * Used to setup the node/yarn/npm/npx shims when running volta < 0.7
+ */
 async function setupShims(toolRoot: string): Promise<void> {
-  // TODO: remove in favor of `volta setup`
   // current volta installations (e.g 0.6.x) expect the common shims
   // to be setup in $VOLTA_HOME/bin
-  //
-  // once https://github.com/volta-cli/volta/issues/564 lands, this can be
-  // removed in favor of calling `volta setup` directly
   setupShim(toolRoot, 'node');
   setupShim(toolRoot, 'yarn');
   setupShim(toolRoot, 'npm');
