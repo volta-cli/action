@@ -6,3 +6,14 @@
 
 #### Committers: 1
 - Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+## v1.1.0 (2020-03-08)
+
+#### :rocket: Enhancement
+* [#5](https://github.com/rwjblue/setup-volta/pull/5) Update to leverage `volta setup` when using Volta 0.7+ ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#4](https://github.com/rwjblue/setup-volta/pull/4) Update dependencies to latest versions. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
