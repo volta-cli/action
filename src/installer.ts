@@ -17,6 +17,10 @@ async function getLatestVolta(): Promise<string> {
   return semver.clean(response.body);
 }
 
+function voltaVersionHasSetup(version: string): boolean {
+  return semver.gte(version, '0.7.0');
+}
+
 export function buildDownloadUrl(platform: string, version: string): string {
   let fileName: string;
   switch (platform) {
@@ -86,35 +90,34 @@ async function acquireVolta(version: string): Promise<string> {
   // Download - a tool installer intimately knows how to get the tool (and construct urls)
   //
 
-  let toolPath = tc.find('volta', version);
+  core.info(`downloading volta@${version}`);
 
-  if (toolPath === '') {
-    core.info(`downloading volta@${version}`);
+  const downloadUrl = buildDownloadUrl(os.platform(), version);
 
-    const downloadUrl = buildDownloadUrl(os.platform(), version);
+  core.debug(`downloading from \`${downloadUrl}\``);
+  const downloadPath = await tc.downloadTool(downloadUrl);
 
-    core.debug(`downloading from \`${downloadUrl}\``);
-    const downloadPath = await tc.downloadTool(downloadUrl);
+  //
+  // Extract
+  //
+  const toolRoot = await tc.extractTar(downloadPath);
+  core.debug(`extracted tarball to '${toolRoot}'`);
 
-    //
-    // Extract
-    //
-    const toolRoot = await tc.extractTar(downloadPath);
-    core.debug(`extracted tarball to '${toolRoot}'`);
+  return toolRoot;
+}
 
-    await buildLayout(toolRoot);
-    await setupShims(toolRoot);
-
-    //
-    // Install into the local tool cache - node extracts with a root folder that matches the fileName downloaded
-    //
-    toolPath = await tc.cacheDir(toolRoot, 'volta', version);
-    core.info(`caching volta@${version}`);
+async function setupVolta(version: string, toolPath: string): Promise<void> {
+  if (voltaVersionHasSetup(version)) {
+    await exec(path.join(toolPath, 'bin', 'volta'), ['setup'], {
+      env: {
+        // VOLTA_HOME needs to be set before calling volta setup
+        VOLTA_HOME: toolPath,
+      },
+    });
   } else {
-    core.info(`using cached volta@${version}`);
+    await buildLayout(toolPath);
+    await setupShims(toolPath);
   }
-
-  return toolPath;
 }
 
 export async function installNode(version: string): Promise<void> {
@@ -133,8 +136,22 @@ export async function getVolta(versionSpec: string): Promise<void> {
     version = await getLatestVolta();
   }
 
-  // download, extract, cache
-  const toolPath = await acquireVolta(version);
+  let toolPath = tc.find('volta', version);
+
+  if (toolPath === '') {
+    // download, extract, cache
+    const toolRoot = await acquireVolta(version);
+
+    await setupVolta(version, toolRoot);
+
+    // Install into the local tool cache - node extracts with a root folder
+    // that matches the fileName downloaded
+    toolPath = await tc.cacheDir(toolRoot, 'volta', version);
+
+    core.info(`caching volta@${version}`);
+  } else {
+    core.info(`using cached volta@${version}`);
+  }
 
   // prepend the tools path. instructs the agent to prepend for future tasks
   if (toolPath !== undefined) {
