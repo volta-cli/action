@@ -3,44 +3,49 @@
   "version": "0.0.0",
   "private": true,
   "description": "Setup volta for usage in your CI runs",
-  "main": "lib/main.js",
-  "scripts": {
-    "build": "tsc",
-    "lint": "eslint --cache . --ext js,ts",
-    "test": "jest"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/rwjblue/setup-volta.git"
-  },
   "keywords": [
     "actions",
     "node",
     "setup"
   ],
-  "author": "Robert Jackson <me@rwjblue.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rwjblue/setup-volta.git"
+  },
   "license": "MIT",
-  "dependencies": {
+  "author": "Robert Jackson <me@rwjblue.com>",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "npm-run-all build:clean build:ts build:dist",
+    "build:clean": "rimraf dist lib",
+    "build:dist": "ncc build src/index.ts",
+    "build:ts": "tsc",
+    "lint": "eslint --cache . --ext js,ts",
+    "test": "jest"
+  },
+  "dependencies": {},
+  "devDependencies": {
     "@actions/core": "^1.2.3",
     "@actions/exec": "^1.0.3",
     "@actions/io": "^1.0.2",
     "@actions/tool-cache": "^1.3.2",
-    "got": "^10.6.0",
-    "semver": "^7.1.3",
-    "symlink-or-copy": "^1.3.1"
-  },
-  "devDependencies": {
     "@types/jest": "^25.1.4",
     "@types/node": "^13.9.0",
+    "@types/semver": "^7.1.0",
     "@typescript-eslint/eslint-plugin": "^2.22.0",
     "@typescript-eslint/parser": "^2.22.0",
+    "@zeit/ncc": "^0.20.5",
     "broccoli-test-helper": "^2.0.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-prettier": "^3.1.2",
+    "got": "^10.6.0",
     "jest": "^25.1.0",
     "jest-circus": "^25.1.0",
+    "npm-run-all": "^4.1.5",
     "prettier": "^1.19.1",
+    "rimraf": "^3.0.2",
+    "semver": "^7.1.3",
     "ts-jest": "^25.2.1",
     "typescript": "^3.8.3"
   }

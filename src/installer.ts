@@ -6,7 +6,6 @@ import got from 'got';
 import * as os from 'os';
 import * as path from 'path';
 import * as semver from 'semver';
-import * as symlinkOrCopy from 'symlink-or-copy';
 import * as fs from 'fs';
 
 async function getLatestVolta(): Promise<string> {
@@ -14,7 +13,7 @@ async function getLatestVolta(): Promise<string> {
 
   const response = await got(url);
 
-  return semver.clean(response.body);
+  return semver.clean(response.body) as string;
 }
 
 function voltaVersionHasSetup(version: string): boolean {
@@ -67,7 +66,7 @@ async function setupShim(toolRoot: string, name: string): Promise<void> {
   const shimSource = path.join(toolRoot, 'shim');
   const shimPath = path.join(toolRoot, 'bin', name);
 
-  symlinkOrCopy.sync(shimSource, shimPath);
+  fs.symlinkSync(shimSource, shimPath);
 
   // TODO: this is not portable to win32, confirm `volta setup` will take care
   // of this for us
