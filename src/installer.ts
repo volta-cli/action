@@ -108,7 +108,7 @@ async function acquireVolta(version: string): Promise<string> {
 
 async function setupVolta(version: string, toolPath: string): Promise<void> {
   if (voltaVersionHasSetup(version)) {
-    await exec(path.join(toolPath, 'bin', 'volta'), ['setup'], {
+    await exec(path.join(toolPath, 'volta'), ['setup'], {
       env: {
         // VOLTA_HOME needs to be set before calling volta setup
         VOLTA_HOME: toolPath,
