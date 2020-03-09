@@ -17,6 +17,10 @@ async function getLatestVolta(): Promise<string> {
   return semver.clean(response.body);
 }
 
+function voltaVersionHasSetup(version: string): boolean {
+  return semver.gte(version, '0.7.0');
+}
+
 export function buildDownloadUrl(platform: string, version: string): string {
   let fileName: string;
   switch (platform) {
@@ -35,14 +39,13 @@ export function buildDownloadUrl(platform: string, version: string): string {
   return `https://github.com/volta-cli/volta/releases/download/v${version}/${fileName}`;
 }
 
+/*
+ * Used to build the required folder structure when installing volta < 0.7
+ */
 export async function buildLayout(toolRoot: string): Promise<void> {
-  // TODO: remove in favor of `volta setup`
   // create the $VOLTA_HOME folder structure (volta doesn't create these
   // folders on demand, and errors when installing node/yarn/tools if it
   // isn't present)
-  //
-  // once https://github.com/volta-cli/volta/issues/564 lands, this can be
-  // removed in favor of calling `volta setup` directly
   await io.mkdirP(path.join(toolRoot, 'tmp'));
   await io.mkdirP(path.join(toolRoot, 'bin'));
   await io.mkdirP(path.join(toolRoot, 'cache/node'));
@@ -57,6 +60,9 @@ export async function buildLayout(toolRoot: string): Promise<void> {
   await io.mkdirP(path.join(toolRoot, 'tools/user'));
 }
 
+/*
+ * Used to setup a specific shim when running volta < 0.7
+ */
 async function setupShim(toolRoot: string, name: string): Promise<void> {
   const shimSource = path.join(toolRoot, 'shim');
   const shimPath = path.join(toolRoot, 'bin', name);
@@ -68,13 +74,12 @@ async function setupShim(toolRoot: string, name: string): Promise<void> {
   await fs.promises.chmod(shimPath, 0o755);
 }
 
+/*
+ * Used to setup the node/yarn/npm/npx shims when running volta < 0.7
+ */
 async function setupShims(toolRoot: string): Promise<void> {
-  // TODO: remove in favor of `volta setup`
   // current volta installations (e.g 0.6.x) expect the common shims
   // to be setup in $VOLTA_HOME/bin
-  //
-  // once https://github.com/volta-cli/volta/issues/564 lands, this can be
-  // removed in favor of calling `volta setup` directly
   setupShim(toolRoot, 'node');
   setupShim(toolRoot, 'yarn');
   setupShim(toolRoot, 'npm');
@@ -86,35 +91,34 @@ async function acquireVolta(version: string): Promise<string> {
   // Download - a tool installer intimately knows how to get the tool (and construct urls)
   //
 
-  let toolPath = tc.find('volta', version);
+  core.info(`downloading volta@${version}`);
 
-  if (toolPath === '') {
-    core.info(`downloading volta@${version}`);
+  const downloadUrl = buildDownloadUrl(os.platform(), version);
 
-    const downloadUrl = buildDownloadUrl(os.platform(), version);
+  core.debug(`downloading from \`${downloadUrl}\``);
+  const downloadPath = await tc.downloadTool(downloadUrl);
 
-    core.debug(`downloading from \`${downloadUrl}\``);
-    const downloadPath = await tc.downloadTool(downloadUrl);
+  //
+  // Extract
+  //
+  const toolRoot = await tc.extractTar(downloadPath);
+  core.debug(`extracted tarball to '${toolRoot}'`);
 
-    //
-    // Extract
-    //
-    const toolRoot = await tc.extractTar(downloadPath);
-    core.debug(`extracted tarball to '${toolRoot}'`);
+  return toolRoot;
+}
 
-    await buildLayout(toolRoot);
-    await setupShims(toolRoot);
-
-    //
-    // Install into the local tool cache - node extracts with a root folder that matches the fileName downloaded
-    //
-    toolPath = await tc.cacheDir(toolRoot, 'volta', version);
-    core.info(`caching volta@${version}`);
+async function setupVolta(version: string, toolPath: string): Promise<void> {
+  if (voltaVersionHasSetup(version)) {
+    await exec(path.join(toolPath, 'volta'), ['setup'], {
+      env: {
+        // VOLTA_HOME needs to be set before calling volta setup
+        VOLTA_HOME: toolPath,
+      },
+    });
   } else {
-    core.info(`using cached volta@${version}`);
+    await buildLayout(toolPath);
+    await setupShims(toolPath);
   }
-
-  return toolPath;
 }
 
 export async function installNode(version: string): Promise<void> {
@@ -133,8 +137,22 @@ export async function getVolta(versionSpec: string): Promise<void> {
     version = await getLatestVolta();
   }
 
-  // download, extract, cache
-  const toolPath = await acquireVolta(version);
+  let toolPath = tc.find('volta', version);
+
+  if (toolPath === '') {
+    // download, extract, cache
+    const toolRoot = await acquireVolta(version);
+
+    await setupVolta(version, toolRoot);
+
+    // Install into the local tool cache - node extracts with a root folder
+    // that matches the fileName downloaded
+    toolPath = await tc.cacheDir(toolRoot, 'volta', version);
+
+    core.info(`caching volta@${version}`);
+  } else {
+    core.info(`using cached volta@${version}`);
+  }
 
   // prepend the tools path. instructs the agent to prepend for future tasks
   if (toolPath !== undefined) {
