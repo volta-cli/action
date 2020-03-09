@@ -64,8 +64,8 @@ jobs:
     - uses: ./
       with:
         volta-version: 0.6.3
-        node-version: 8
-        yarn-version: 1.7
+        node-version: 10
+        yarn-version: 1.22
 
     - run: volta --version
     - run: volta install node@10 yarn
