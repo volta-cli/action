@@ -8,7 +8,12 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest]
+
     steps:
     - uses: actions/checkout@v1
 
@@ -39,7 +44,12 @@ jobs:
 
 
   test-no-options:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest]
+
     steps:
     - uses: actions/checkout@v1
 
@@ -56,7 +66,12 @@ jobs:
     - run: volta which yarn
 
   test-specific-volta:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest]
+
     steps:
     - uses: actions/checkout@v1
 
@@ -76,7 +91,12 @@ jobs:
     - run: volta which yarn
 
   test-specific-volta-node-yarn:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest]
+
     steps:
     - uses: actions/checkout@v1
 
