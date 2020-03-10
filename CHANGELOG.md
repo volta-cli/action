@@ -1,3 +1,12 @@
+## v1.2.1 (2020-03-10)
+
+#### :house: Internal
+* [#8](https://github.com/rwjblue/setup-volta/pull/8) Update to latest automated release setup. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v1.2.0 (2020-03-09)
 
 #### :house: Internal
