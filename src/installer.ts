@@ -7,6 +7,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as semver from 'semver';
 import * as fs from 'fs';
+import { v4 as uuidV4 } from 'uuid';
 
 async function getLatestVolta(): Promise<string> {
   const url = 'https://volta.sh/latest-version';
@@ -59,32 +60,6 @@ export async function buildLayout(toolRoot: string): Promise<void> {
   await io.mkdirP(path.join(toolRoot, 'tools/user'));
 }
 
-/*
- * Used to setup a specific shim when running volta < 0.7
- */
-async function setupShim(toolRoot: string, name: string): Promise<void> {
-  const shimSource = path.join(toolRoot, 'shim');
-  const shimPath = path.join(toolRoot, 'bin', name);
-
-  fs.symlinkSync(shimSource, shimPath);
-
-  // TODO: this is not portable to win32, confirm `volta setup` will take care
-  // of this for us
-  await fs.promises.chmod(shimPath, 0o755);
-}
-
-/*
- * Used to setup the node/yarn/npm/npx shims when running volta < 0.7
- */
-async function setupShims(toolRoot: string): Promise<void> {
-  // current volta installations (e.g 0.6.x) expect the common shims
-  // to be setup in $VOLTA_HOME/bin
-  setupShim(toolRoot, 'node');
-  setupShim(toolRoot, 'yarn');
-  setupShim(toolRoot, 'npm');
-  setupShim(toolRoot, 'npx');
-}
-
 async function acquireVolta(version: string): Promise<string> {
   //
   // Download - a tool installer intimately knows how to get the tool (and construct urls)
@@ -97,18 +72,26 @@ async function acquireVolta(version: string): Promise<string> {
   core.debug(`downloading from \`${downloadUrl}\``);
   const downloadPath = await tc.downloadTool(downloadUrl);
 
+  const voltaHome = path.join(
+    // `RUNNER_TEMP` is used by @actions/tool-cache
+    process.env['RUNNER_TEMP'] || '',
+    uuidV4()
+  );
+
+  await io.mkdirP(voltaHome);
+
   //
   // Extract
   //
-  const toolRoot = await tc.extractTar(downloadPath);
-  core.debug(`extracted tarball to '${toolRoot}'`);
+  const toolRoot = await tc.extractTar(downloadPath, path.join(voltaHome, 'bin'));
+  core.debug(`extracted "${fs.readdirSync(toolRoot).join('","')}" from tarball into '${toolRoot}'`);
 
-  return toolRoot;
+  return voltaHome;
 }
 
 async function setupVolta(version: string, toolPath: string): Promise<void> {
   if (voltaVersionHasSetup(version)) {
-    await exec(path.join(toolPath, 'volta'), ['setup'], {
+    await exec(path.join(toolPath, 'bin', 'volta'), ['setup'], {
       env: {
         // VOLTA_HOME needs to be set before calling volta setup
         VOLTA_HOME: toolPath,
@@ -116,7 +99,6 @@ async function setupVolta(version: string, toolPath: string): Promise<void> {
     });
   } else {
     await buildLayout(toolPath);
-    await setupShims(toolPath);
   }
 }
 
@@ -155,7 +137,6 @@ export async function getVolta(versionSpec: string): Promise<void> {
 
   // prepend the tools path. instructs the agent to prepend for future tasks
   if (toolPath !== undefined) {
-    core.addPath(toolPath);
     core.addPath(path.join(toolPath, 'bin'));
     core.exportVariable('VOLTA_HOME', toolPath);
   }
