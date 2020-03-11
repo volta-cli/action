@@ -1,3 +1,15 @@
+## v1.4.0 (2020-03-11)
+
+#### :memo: Documentation
+* [#17](https://github.com/volta-cli/action/pull/17) Tweak action.yml name and description. ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#15](https://github.com/volta-cli/action/pull/15) Fix repo references (rwjblue/setup-volta -> volta-cli/action). ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v1.3.0 (2020-03-11)
 
 #### :rocket: Enhancement
