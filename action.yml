@@ -11,6 +11,9 @@ inputs:
   yarn-version:
     description: 'Version Spec of the yarn version to use.  Examples: 1.6.x, 10.15.1, >=10.15.0'
     default: ''
+branding:
+  icon: 'zap'
+  color: 'yellow'
 runs:
   using: 'node12'
   main: 'dist/index.js'
