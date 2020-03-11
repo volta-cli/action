@@ -106,7 +106,7 @@ jobs:
       with:
         volta-version: 0.7.2
         node-version: 12
-        yarn-version: 1.22
+        yarn-version: 1.22.4
 
     - run: volta --version
     - run: volta install node@10 yarn
