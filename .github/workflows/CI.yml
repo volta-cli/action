@@ -33,14 +33,15 @@ jobs:
       with:
         volta-version: 0.6.3
 
-    - run: volta --version
-    - run: volta install node@10 yarn
-    - run: node --version
+    - run: node tests/log-info.js
+    - run: node tests/check-version.js 'volta' '0.6.3'
+    - run: volta install node@10.0.0 yarn@1.19.0
     - run: which node
     - run: volta which node
-    - run: yarn --version
+    - run: node tests/check-version.js 'node' 'v10.0.0'
     - run: which yarn
     - run: volta which yarn
+    - run: node tests/check-version.js 'yarn' '1.19.0'
 
 
   test-no-options:
@@ -56,14 +57,16 @@ jobs:
     - run: npm ci
     - run: npm run build
     - uses: ./
-    - run: volta --version
-    - run: volta install node@10 yarn
-    - run: node --version
+
+    - run: node tests/log-info.js
+    - run: node tests/check-version.js 'volta' 'current'
+    - run: volta install node@12.16.1 yarn@1.19.1
     - run: which node
     - run: volta which node
-    - run: yarn --version
+    - run: node tests/check-version.js 'node' 'v12.16.1'
     - run: which yarn
     - run: volta which yarn
+    - run: node tests/check-version.js 'yarn' '1.19.1'
 
   test-specific-volta:
     runs-on: ${{ matrix.os }}
@@ -79,16 +82,17 @@ jobs:
     - run: npm run build
     - uses: ./
       with:
-        volta-version: 0.7.2
+        volta-version: 0.7.0
 
-    - run: volta --version
-    - run: volta install node@10 yarn
-    - run: node --version
+    - run: node tests/log-info.js
+    - run: node tests/check-version.js 'volta' '0.7.0'
+    - run: volta install node@12.16.1 yarn@1.19.1
     - run: which node
     - run: volta which node
-    - run: yarn --version
+    - run: node tests/check-version.js 'node' 'v12.16.1'
     - run: which yarn
     - run: volta which yarn
+    - run: node tests/check-version.js 'yarn' '1.19.1'
 
   test-specific-volta-node-yarn:
     runs-on: ${{ matrix.os }}
@@ -104,15 +108,22 @@ jobs:
     - run: npm run build
     - uses: ./
       with:
-        volta-version: 0.7.2
-        node-version: 12
-        yarn-version: 1.22.4
+        volta-version: 0.7.1
+        node-version: 12.0.0
+        yarn-version: 1.22.0
 
-    - run: volta --version
-    - run: volta install node@10 yarn
-    - run: node --version
+    - run: node tests/log-info.js
+    - run: node tests/check-version.js 'volta' '0.7.1'
     - run: which node
     - run: volta which node
-    - run: yarn --version
+    - run: node tests/check-version.js 'node' 'v12.0.0'
     - run: which yarn
     - run: volta which yarn
+    - run: node tests/check-version.js 'yarn' '1.22.0'
+    - run: volta install node@10.0.0 yarn@1.19.0
+    - run: which node
+    - run: volta which node
+    - run: node tests/check-version.js 'node' 'v10.0.0'
+    - run: which yarn
+    - run: volta which yarn
+    - run: node tests/check-version.js 'yarn' '1.19.0'
