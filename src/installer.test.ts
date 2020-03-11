@@ -31,30 +31,42 @@ describe('buildLayout', () => {
   test('creates the rough folder structure', async () => {
     const tmpdir = await createTempDir();
 
+    tmpdir.write({
+      bin: {
+        shim: 'shim-file-here',
+      },
+    });
+
     await buildLayout(tmpdir.path());
 
     expect(tmpdir.read()).toMatchInlineSnapshot(`
-      Object {
-        "bin": Object {},
-        "cache": Object {
-          "node": Object {},
-        },
-        "log": Object {},
-        "tmp": Object {},
-        "tools": Object {
-          "image": Object {
-            "node": Object {},
-            "packages": Object {},
-            "yarn": Object {},
-          },
-          "inventory": Object {
-            "node": Object {},
-            "packages": Object {},
-            "yarn": Object {},
-          },
-          "user": Object {},
-        },
-      }
-    `);
+Object {
+  "bin": Object {
+    "node": "shim-file-here",
+    "npm": "shim-file-here",
+    "npx": "shim-file-here",
+    "shim": "shim-file-here",
+    "yarn": "shim-file-here",
+  },
+  "cache": Object {
+    "node": Object {},
+  },
+  "log": Object {},
+  "tmp": Object {},
+  "tools": Object {
+    "image": Object {
+      "node": Object {},
+      "packages": Object {},
+      "yarn": Object {},
+    },
+    "inventory": Object {
+      "node": Object {},
+      "packages": Object {},
+      "yarn": Object {},
+    },
+    "user": Object {},
+  },
+}
+`);
   });
 });
