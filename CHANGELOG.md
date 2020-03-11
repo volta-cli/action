@@ -1,3 +1,12 @@
+## v1.4.2 (2020-03-11)
+
+#### :bug: Bug Fix
+* [#20](https://github.com/volta-cli/action/pull/20) Ensure shims work properly when used with volta@0.6 ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v1.4.1 (2020-03-11)
 
 #### :house: Internal

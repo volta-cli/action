@@ -11697,25 +11697,52 @@ function buildDownloadUrl(platform, version) {
 }
 exports.buildDownloadUrl = buildDownloadUrl;
 /*
+ * Used to setup a specific shim when running volta < 0.7
+ */
+function setupShim(voltaHome, name) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const shimSource = path.join(voltaHome, 'bin', 'shim');
+        const shimPath = path.join(voltaHome, 'bin', name);
+        fs.copyFileSync(shimSource, shimPath);
+        // TODO: this is not portable to win32, confirm `volta setup` will take care
+        // of this for us
+        yield fs.promises.chmod(shimPath, 0o755);
+    });
+}
+/*
+ * Used to setup the node/yarn/npm/npx shims when running volta < 0.7
+ */
+function setupShims(voltaHome) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // current volta installations (e.g 0.6.x) expect the common shims
+        // to be setup in $VOLTA_HOME/bin
+        setupShim(voltaHome, 'node');
+        setupShim(voltaHome, 'yarn');
+        setupShim(voltaHome, 'npm');
+        setupShim(voltaHome, 'npx');
+    });
+}
+/*
  * Used to build the required folder structure when installing volta < 0.7
  */
-function buildLayout(toolRoot) {
+function buildLayout(voltaHome) {
     return __awaiter(this, void 0, void 0, function* () {
         // create the $VOLTA_HOME folder structure (volta doesn't create these
         // folders on demand, and errors when installing node/yarn/tools if it
         // isn't present)
-        yield io.mkdirP(path.join(toolRoot, 'tmp'));
-        yield io.mkdirP(path.join(toolRoot, 'bin'));
-        yield io.mkdirP(path.join(toolRoot, 'cache/node'));
-        yield io.mkdirP(path.join(toolRoot, 'log'));
-        yield io.mkdirP(path.join(toolRoot, 'tmp'));
-        yield io.mkdirP(path.join(toolRoot, 'tools/image/node'));
-        yield io.mkdirP(path.join(toolRoot, 'tools/image/packages'));
-        yield io.mkdirP(path.join(toolRoot, 'tools/image/yarn'));
-        yield io.mkdirP(path.join(toolRoot, 'tools/inventory/node'));
-        yield io.mkdirP(path.join(toolRoot, 'tools/inventory/packages'));
-        yield io.mkdirP(path.join(toolRoot, 'tools/inventory/yarn'));
-        yield io.mkdirP(path.join(toolRoot, 'tools/user'));
+        yield io.mkdirP(path.join(voltaHome, 'tmp'));
+        yield io.mkdirP(path.join(voltaHome, 'bin'));
+        yield io.mkdirP(path.join(voltaHome, 'cache/node'));
+        yield io.mkdirP(path.join(voltaHome, 'log'));
+        yield io.mkdirP(path.join(voltaHome, 'tmp'));
+        yield io.mkdirP(path.join(voltaHome, 'tools/image/node'));
+        yield io.mkdirP(path.join(voltaHome, 'tools/image/packages'));
+        yield io.mkdirP(path.join(voltaHome, 'tools/image/yarn'));
+        yield io.mkdirP(path.join(voltaHome, 'tools/inventory/node'));
+        yield io.mkdirP(path.join(voltaHome, 'tools/inventory/packages'));
+        yield io.mkdirP(path.join(voltaHome, 'tools/inventory/yarn'));
+        yield io.mkdirP(path.join(voltaHome, 'tools/user'));
+        yield setupShims(voltaHome);
     });
 }
 exports.buildLayout = buildLayout;
@@ -11751,18 +11778,18 @@ function acquireVolta(version) {
         return voltaHome;
     });
 }
-function setupVolta(version, toolPath) {
+function setupVolta(version, voltaHome) {
     return __awaiter(this, void 0, void 0, function* () {
         if (voltaVersionHasSetup(version)) {
-            yield exec_1.exec(path.join(toolPath, 'bin', 'volta'), ['setup'], {
+            yield exec_1.exec(path.join(voltaHome, 'bin', 'volta'), ['setup'], {
                 env: {
                     // VOLTA_HOME needs to be set before calling volta setup
-                    VOLTA_HOME: toolPath,
+                    VOLTA_HOME: voltaHome,
                 },
             });
         }
         else {
-            yield buildLayout(toolPath);
+            yield buildLayout(voltaHome);
         }
     });
 }
@@ -11802,23 +11829,23 @@ function getVolta(versionSpec) {
         if (semver.valid(version) === null) {
             version = yield getLatestVolta();
         }
-        let toolPath = tc.find('volta', version);
-        if (toolPath === '') {
+        let voltaHome = tc.find('volta', version);
+        if (voltaHome === '') {
             // download, extract, cache
             const toolRoot = yield acquireVolta(version);
             yield setupVolta(version, toolRoot);
             // Install into the local tool cache - node extracts with a root folder
             // that matches the fileName downloaded
-            toolPath = yield tc.cacheDir(toolRoot, 'volta', version);
+            voltaHome = yield tc.cacheDir(toolRoot, 'volta', version);
             core.info(`caching volta@${version}`);
         }
         else {
             core.info(`using cached volta@${version}`);
         }
         // prepend the tools path. instructs the agent to prepend for future tasks
-        if (toolPath !== undefined) {
-            core.addPath(path.join(toolPath, 'bin'));
-            core.exportVariable('VOLTA_HOME', toolPath);
+        if (voltaHome !== undefined) {
+            core.addPath(path.join(voltaHome, 'bin'));
+            core.exportVariable('VOLTA_HOME', voltaHome);
         }
     });
 }
