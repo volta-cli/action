@@ -18,7 +18,7 @@ Basic (when the project's `package.json` has a `volta` property with `node` and/
 ```yaml
 steps:
 - uses: actions/checkout@v1
-- uses: rwjblue/setup-volta@v1
+- uses: volta-cli/setup-volta@v1
 - run: npm install
 - run: npm test
 ```
@@ -46,7 +46,7 @@ strategy:
 
 steps:
 - uses: actions/checkout@v1
-- uses: rwjblue/setup-volta@v1
+- uses: volta-cli/setup-volta@v1
   with:
     node-version: ${{ matrix.node-version }}
 
