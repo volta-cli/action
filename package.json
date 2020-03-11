@@ -54,8 +54,8 @@
     "uuid": "^7.0.2"
   },
   "release-it": {
-    "scripts": {
-      "after:bump": "npm build"
+    "hooks": {
+      "after:bump": "npm run build"
     },
     "plugins": {
       "release-it-lerna-changelog": {
