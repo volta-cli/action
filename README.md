@@ -28,7 +28,7 @@ Manually specifying node and/or yarn versions (e.g. to test a project without `v
 ```yaml
 steps:
 - uses: actions/checkout@v1
-- uses: rwjblue/setup-volta@v1
+- uses: volta-cli/setup-volta@v1
   with:
     node-version: 10.x
     yarn-version: 1.19.1
