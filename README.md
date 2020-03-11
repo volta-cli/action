@@ -1,7 +1,7 @@
 # setup-volta
 
 <p align="left">
-  <a href="https://github.com/rwjblue/setup-volta"><img alt="GitHub Actions status" src="https://github.com/rwjblue/setup-volta/workflows/CI/badge.svg"></a>
+  <a href="https://github.com/volta-cli/action"><img alt="GitHub Actions status" src="https://github.com/volta-cli/action/workflows/CI/badge.svg"></a>
 </p>
 
 This action installs [volta](https://volta.sh) by:
@@ -18,7 +18,7 @@ Basic (when the project's `package.json` has a `volta` property with `node` and/
 ```yaml
 steps:
 - uses: actions/checkout@v1
-- uses: rwjblue/setup-volta@v1
+- uses: volta-cli/action@v1
 - run: npm install
 - run: npm test
 ```
@@ -28,7 +28,7 @@ Manually specifying node and/or yarn versions (e.g. to test a project without `v
 ```yaml
 steps:
 - uses: actions/checkout@v1
-- uses: rwjblue/setup-volta@v1
+- uses: volta-cli/action@v1
   with:
     node-version: 10.x
     yarn-version: 1.19.1
@@ -46,7 +46,7 @@ strategy:
 
 steps:
 - uses: actions/checkout@v1
-- uses: rwjblue/setup-volta@v1
+- uses: volta-cli/action@v1
   with:
     node-version: ${{ matrix.node-version }}
 
