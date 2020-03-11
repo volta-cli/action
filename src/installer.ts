@@ -31,7 +31,8 @@ export function buildDownloadUrl(platform: string, version: string): string {
       fileName = `volta-${version}-linux-openssl-1.1.tar.gz`;
       break;
     case 'win32':
-      throw new Error('windows is not yet supported');
+      fileName = `volta-${version}-windows-x86_64.msi`;
+      break;
     default:
       throw new Error(`your platform ${platform} is not yet supported`);
   }
@@ -83,8 +84,24 @@ async function acquireVolta(version: string): Promise<string> {
   //
   // Extract
   //
-  const toolRoot = await tc.extractTar(downloadPath, path.join(voltaHome, 'bin'));
-  core.debug(`extracted "${fs.readdirSync(toolRoot).join('","')}" from tarball into '${toolRoot}'`);
+  const voltaHomeBin = path.join(voltaHome, 'bin');
+  if (os.platform() === 'win32') {
+    const tmpExtractTarget = path.join(
+      // `RUNNER_TEMP` is used by @actions/tool-cache
+      process.env['RUNNER_TEMP'] || '',
+      uuidV4()
+    );
+    const msiexecPath = await io.which('msiexec', true);
+
+    await exec(msiexecPath, ['/a', downloadPath, '/qn', `TARGETDIR=${tmpExtractTarget}`]);
+    await io.cp(path.join(tmpExtractTarget, 'PFiles', 'volta'), voltaHomeBin, { recursive: true });
+  } else {
+    await tc.extractTar(downloadPath, voltaHomeBin);
+  }
+
+  core.debug(
+    `extracted "${fs.readdirSync(voltaHomeBin).join('","')}" from tarball into '${voltaHomeBin}'`
+  );
 
   return voltaHome;
 }

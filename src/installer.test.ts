@@ -15,8 +15,8 @@ describe('buildDownloadUrl', () => {
   });
 
   test('win32', function() {
-    expect(() => buildDownloadUrl('win32', '0.6.4')).toThrowErrorMatchingInlineSnapshot(
-      `"windows is not yet supported"`
+    expect(buildDownloadUrl('win32', '0.7.2')).toMatchInlineSnapshot(
+      `"https://github.com/volta-cli/volta/releases/download/v0.7.2/volta-0.7.2-windows-x86_64.msi"`
     );
   });
 
