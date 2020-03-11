@@ -41,24 +41,51 @@ export function buildDownloadUrl(platform: string, version: string): string {
 }
 
 /*
+ * Used to setup a specific shim when running volta < 0.7
+ */
+async function setupShim(voltaHome: string, name: string): Promise<void> {
+  const shimSource = path.join(voltaHome, 'bin', 'shim');
+  const shimPath = path.join(voltaHome, 'bin', name);
+
+  fs.copyFileSync(shimSource, shimPath);
+
+  // TODO: this is not portable to win32, confirm `volta setup` will take care
+  // of this for us
+  await fs.promises.chmod(shimPath, 0o755);
+}
+
+/*
+ * Used to setup the node/yarn/npm/npx shims when running volta < 0.7
+ */
+async function setupShims(voltaHome: string): Promise<void> {
+  // current volta installations (e.g 0.6.x) expect the common shims
+  // to be setup in $VOLTA_HOME/bin
+  setupShim(voltaHome, 'node');
+  setupShim(voltaHome, 'yarn');
+  setupShim(voltaHome, 'npm');
+  setupShim(voltaHome, 'npx');
+}
+
+/*
  * Used to build the required folder structure when installing volta < 0.7
  */
-export async function buildLayout(toolRoot: string): Promise<void> {
+export async function buildLayout(voltaHome: string): Promise<void> {
   // create the $VOLTA_HOME folder structure (volta doesn't create these
   // folders on demand, and errors when installing node/yarn/tools if it
   // isn't present)
-  await io.mkdirP(path.join(toolRoot, 'tmp'));
-  await io.mkdirP(path.join(toolRoot, 'bin'));
-  await io.mkdirP(path.join(toolRoot, 'cache/node'));
-  await io.mkdirP(path.join(toolRoot, 'log'));
-  await io.mkdirP(path.join(toolRoot, 'tmp'));
-  await io.mkdirP(path.join(toolRoot, 'tools/image/node'));
-  await io.mkdirP(path.join(toolRoot, 'tools/image/packages'));
-  await io.mkdirP(path.join(toolRoot, 'tools/image/yarn'));
-  await io.mkdirP(path.join(toolRoot, 'tools/inventory/node'));
-  await io.mkdirP(path.join(toolRoot, 'tools/inventory/packages'));
-  await io.mkdirP(path.join(toolRoot, 'tools/inventory/yarn'));
-  await io.mkdirP(path.join(toolRoot, 'tools/user'));
+  await io.mkdirP(path.join(voltaHome, 'tmp'));
+  await io.mkdirP(path.join(voltaHome, 'bin'));
+  await io.mkdirP(path.join(voltaHome, 'cache/node'));
+  await io.mkdirP(path.join(voltaHome, 'log'));
+  await io.mkdirP(path.join(voltaHome, 'tmp'));
+  await io.mkdirP(path.join(voltaHome, 'tools/image/node'));
+  await io.mkdirP(path.join(voltaHome, 'tools/image/packages'));
+  await io.mkdirP(path.join(voltaHome, 'tools/image/yarn'));
+  await io.mkdirP(path.join(voltaHome, 'tools/inventory/node'));
+  await io.mkdirP(path.join(voltaHome, 'tools/inventory/packages'));
+  await io.mkdirP(path.join(voltaHome, 'tools/inventory/yarn'));
+  await io.mkdirP(path.join(voltaHome, 'tools/user'));
+  await setupShims(voltaHome);
 }
 
 async function acquireVolta(version: string): Promise<string> {
@@ -106,16 +133,16 @@ async function acquireVolta(version: string): Promise<string> {
   return voltaHome;
 }
 
-async function setupVolta(version: string, toolPath: string): Promise<void> {
+async function setupVolta(version: string, voltaHome: string): Promise<void> {
   if (voltaVersionHasSetup(version)) {
-    await exec(path.join(toolPath, 'bin', 'volta'), ['setup'], {
+    await exec(path.join(voltaHome, 'bin', 'volta'), ['setup'], {
       env: {
         // VOLTA_HOME needs to be set before calling volta setup
-        VOLTA_HOME: toolPath,
+        VOLTA_HOME: voltaHome,
       },
     });
   } else {
-    await buildLayout(toolPath);
+    await buildLayout(voltaHome);
   }
 }
 
@@ -153,9 +180,9 @@ export async function getVolta(versionSpec: string): Promise<void> {
     version = await getLatestVolta();
   }
 
-  let toolPath = tc.find('volta', version);
+  let voltaHome = tc.find('volta', version);
 
-  if (toolPath === '') {
+  if (voltaHome === '') {
     // download, extract, cache
     const toolRoot = await acquireVolta(version);
 
@@ -163,7 +190,7 @@ export async function getVolta(versionSpec: string): Promise<void> {
 
     // Install into the local tool cache - node extracts with a root folder
     // that matches the fileName downloaded
-    toolPath = await tc.cacheDir(toolRoot, 'volta', version);
+    voltaHome = await tc.cacheDir(toolRoot, 'volta', version);
 
     core.info(`caching volta@${version}`);
   } else {
@@ -171,8 +198,8 @@ export async function getVolta(versionSpec: string): Promise<void> {
   }
 
   // prepend the tools path. instructs the agent to prepend for future tasks
-  if (toolPath !== undefined) {
-    core.addPath(path.join(toolPath, 'bin'));
-    core.exportVariable('VOLTA_HOME', toolPath);
+  if (voltaHome !== undefined) {
+    core.addPath(path.join(voltaHome, 'bin'));
+    core.exportVariable('VOLTA_HOME', voltaHome);
   }
 }
