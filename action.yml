@@ -1,5 +1,5 @@
-name: 'Setup Volta environment'
-description: 'Setup a Volta environment and add it to the PATH'
+name: '@volta-cli/action'
+description: 'Setup a Node.js environment with Volta'
 author: 'Robert Jackson <me@rwjblue.com>'
 inputs:
   volta-version:
