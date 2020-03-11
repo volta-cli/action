@@ -102,12 +102,30 @@ async function setupVolta(version: string, toolPath: string): Promise<void> {
   }
 }
 
+export async function execVolta(specifiedArgs: string[]): Promise<void> {
+  const args = [...specifiedArgs];
+  let options;
+
+  if (core.isDebug()) {
+    args.unshift('--verbose');
+
+    options = {
+      env: {
+        VOLTA_LOGLEVEL: 'debug',
+        RUST_STACKTRACE: 'full',
+      },
+    };
+  }
+
+  await exec('volta', args, options);
+}
+
 export async function installNode(version: string): Promise<void> {
-  await exec('volta', ['install', `node${version === 'true' ? '' : `@${version}`}`]);
+  await execVolta(['install', `node${version === 'true' ? '' : `@${version}`}`]);
 }
 
 export async function installYarn(version: string): Promise<void> {
-  await exec('volta', ['install', `yarn${version === 'true' ? '' : `@${version}`}`]);
+  await execVolta(['install', `yarn${version === 'true' ? '' : `@${version}`}`]);
 }
 
 export async function getVolta(versionSpec: string): Promise<void> {
