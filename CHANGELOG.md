@@ -1,3 +1,12 @@
+## v1.4.1 (2020-03-11)
+
+#### :house: Internal
+* [#18](https://github.com/volta-cli/action/pull/18) Setup branding for GitHub Marketplace ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v1.4.0 (2020-03-11)
 
 #### :memo: Documentation
