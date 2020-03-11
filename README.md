@@ -1,4 +1,4 @@
-# setup-volta
+# GitHub Action to Setup Volta
 
 <p align="left">
   <a href="https://github.com/volta-cli/action"><img alt="GitHub Actions status" src="https://github.com/volta-cli/action/workflows/CI/badge.svg"></a>
