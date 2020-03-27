@@ -1,3 +1,17 @@
+## v1.4.3 (2020-03-27)
+
+#### :bug: Bug Fix
+* [#24](https://github.com/volta-cli/action/pull/24) Ensure specifying a `node-version` updates the pinned node. ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#23](https://github.com/volta-cli/action/pull/23) Update to prettier@2. ([@rwjblue](https://github.com/rwjblue))
+* [#22](https://github.com/volta-cli/action/pull/22) Update dependencies and devDependencies to latest versions. ([@rwjblue](https://github.com/rwjblue))
+* [#19](https://github.com/volta-cli/action/pull/19) Update CI workflow to assert expected versions. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v1.4.2 (2020-03-11)
 
 #### :bug: Bug Fix
