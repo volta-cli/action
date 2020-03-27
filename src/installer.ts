@@ -172,6 +172,14 @@ export async function installYarn(version: string): Promise<void> {
   await execVolta(['install', `yarn${version === 'true' ? '' : `@${version}`}`]);
 }
 
+export async function pinNode(version: string): Promise<void> {
+  await execVolta(['pin', `node${version === 'true' ? '' : `@${version}`}`]);
+}
+
+export async function pinYarn(version: string): Promise<void> {
+  await execVolta(['pin', `yarn${version === 'true' ? '' : `@${version}`}`]);
+}
+
 export async function getVolta(versionSpec: string): Promise<void> {
   let version = semver.clean(versionSpec) || '';
 

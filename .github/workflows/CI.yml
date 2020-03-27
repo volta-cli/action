@@ -94,6 +94,41 @@ jobs:
     - run: volta which yarn
     - run: node tests/check-version.js 'yarn' '1.19.1'
 
+  test-specified-node-yarn-overrides-pinned-versions:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: 'branch-for-testing-overriding-pinned-projects-in-ci'
+
+    - uses: actions/checkout@v2
+      with:
+        path: action
+
+    - run: npm ci
+      working-directory: ./action
+    - run: npm run build
+      working-directory: ./action
+
+    - uses: ./action
+      with:
+        node-version: 12.14.0
+        yarn-version: 1.22.0
+
+    - run: node ./action/tests/log-info.js
+    - run: node ./action/tests/check-version.js 'volta' '0.7.1'
+    - run: which node
+    - run: volta which node
+    - run: node ./action/tests/check-version.js 'node' 'v12.14.0'
+    - run: which yarn
+    - run: volta which yarn
+    - run: node ./action/tests/check-version.js 'yarn' '1.22.0'
+
   test-specific-volta-node-yarn:
     runs-on: ${{ matrix.os }}
 
@@ -120,10 +155,3 @@ jobs:
     - run: which yarn
     - run: volta which yarn
     - run: node tests/check-version.js 'yarn' '1.22.0'
-    - run: volta install node@10.0.0 yarn@1.19.0
-    - run: which node
-    - run: volta which node
-    - run: node tests/check-version.js 'node' 'v10.0.0'
-    - run: which yarn
-    - run: volta which yarn
-    - run: node tests/check-version.js 'yarn' '1.19.0'
