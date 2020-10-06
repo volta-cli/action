@@ -10,6 +10,9 @@ defaults:
   run:
     shell: bash
 
+env:
+  NODE_OPTIONS: '--unhandled-rejections=strict'
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -39,8 +42,8 @@ jobs:
 
     - run: tests/log-info.sh
     - run: tests/check-version.sh 'volta' '0.6.3'
-    - run: volta install node@10.0.0 yarn@1.19.0
-    - run: tests/check-version.sh 'node' 'v10.0.0'
+    - run: volta install node@10.17.0 yarn@1.19.0
+    - run: tests/check-version.sh 'node' 'v10.17.0'
     - run: tests/check-version.sh 'yarn' '1.19.0'
 
 

@@ -200,14 +200,18 @@ export async function getVolta(versionSpec: string): Promise<void> {
     // that matches the fileName downloaded
     voltaHome = await tc.cacheDir(toolRoot, 'volta', version);
 
-    core.info(`caching volta@${version}`);
+    core.info(`caching volta@${version} into ${voltaHome}`);
   } else {
     core.info(`using cached volta@${version}`);
   }
 
   // prepend the tools path. instructs the agent to prepend for future tasks
   if (voltaHome !== undefined) {
-    core.addPath(path.join(voltaHome, 'bin'));
+    const binPath = path.join(voltaHome, 'bin');
+
+    core.info(`adding ${binPath} to $PATH`);
+
+    core.addPath(binPath);
     core.exportVariable('VOLTA_HOME', voltaHome);
   }
 }
