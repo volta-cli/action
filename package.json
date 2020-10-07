@@ -49,7 +49,7 @@
     "jest-circus": "^26.5.2",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.1.2",
-    "release-it": "^13.4.0",
+    "release-it": "^14.0.4",
     "release-it-lerna-changelog": "^2.4.0",
     "rimraf": "^3.0.2",
     "semver": "^7.3.2",
