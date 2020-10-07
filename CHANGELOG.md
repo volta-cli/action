@@ -1,3 +1,25 @@
+## v1.5.0 (2020-10-07)
+
+#### :rocket: Enhancement
+* [#30](https://github.com/volta-cli/action/pull/30) Resolve warnings about the `add-path` command being deprecated. Update @actions/core to latest. ([@dependabot[bot]](https://github.com/apps/dependabot))
+
+#### :house: Internal
+* [#40](https://github.com/volta-cli/action/pull/40) Re-roll package-lock.json. ([@rwjblue](https://github.com/rwjblue))
+* [#28](https://github.com/volta-cli/action/pull/28) Update dependencies to latest. ([@rwjblue](https://github.com/rwjblue))
+* [#39](https://github.com/volta-cli/action/pull/39) Migrate to @vercel/ncc ([@rwjblue](https://github.com/rwjblue))
+* [#38](https://github.com/volta-cli/action/pull/38) Update @actions/tool-cache and @actions/exec to latest. ([@rwjblue](https://github.com/rwjblue))
+* [#37](https://github.com/volta-cli/action/pull/37) Update jest and related packages to latest. ([@rwjblue](https://github.com/rwjblue))
+* [#34](https://github.com/volta-cli/action/pull/34) Ensure all test scripts fail on uncaught exceptions. ([@rwjblue](https://github.com/rwjblue))
+* [#36](https://github.com/volta-cli/action/pull/36) Migrate internal workflow tests to shell scripts. ([@rwjblue](https://github.com/rwjblue))
+* [#35](https://github.com/volta-cli/action/pull/35) Update uuid to latest. ([@rwjblue](https://github.com/rwjblue))
+* [#33](https://github.com/volta-cli/action/pull/33) Update typescript and related @types packages to latest. ([@rwjblue](https://github.com/rwjblue))
+* [#32](https://github.com/volta-cli/action/pull/32) Add more logging to tests/log-info.js ([@rwjblue](https://github.com/rwjblue))
+* [#31](https://github.com/volta-cli/action/pull/31) Update linting configuration and dependencies. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v1.4.3 (2020-03-27)
 
 #### :bug: Bug Fix
