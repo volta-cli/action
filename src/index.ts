@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import findUp from 'find-up';
 import * as installer from './installer';
+import addMatchers from './matchers';
 
 async function run(): Promise<void> {
   try {
@@ -29,6 +30,8 @@ async function run(): Promise<void> {
         await installer.pinYarn(yarnVersion);
       }
     }
+
+    await addMatchers();
   } catch (error) {
     core.setFailed(error.message);
   }
