@@ -15,11 +15,11 @@ env:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: "${{ matrix.os }}-latest"
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu, macOS, windows]
 
     steps:
     - uses: actions/checkout@v1
@@ -29,30 +29,40 @@ jobs:
     - run: npm run build
     - run: npm test
 
-  test-volta-0-6:
-    runs-on: ubuntu-latest
+  test-specific-volta:
+    runs-on: "${{ matrix.os }}-latest"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        volta-version: ["0.9.0","0.8.7","0.7.2","0.6.8"]
+        os: [ubuntu, macOS, windows]
+        exclude:
+          # this action didn't support windows until at least Volta 0.7
+          - os: windows
+            volta-version: "0.6.8"
+
     steps:
     - uses: actions/checkout@v1
-
     - run: npm ci
     - run: npm run build
     - uses: ./
       with:
-        volta-version: 0.6.3
+        volta-version: ${{ matrix.volta-version }}
 
     - run: tests/log-info.sh
-    - run: tests/check-version.sh 'volta' '0.6.3'
+    - run: tests/check-version.sh 'volta' ${{ matrix.volta-version }}
     - run: volta install node@10.17.0 yarn@1.19.0
     - run: tests/check-version.sh 'node' 'v10.17.0'
     - run: tests/check-version.sh 'yarn' '1.19.0'
 
 
   test-no-options:
-    runs-on: ${{ matrix.os }}
+    runs-on: "${{ matrix.os }}-latest"
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu, macOS, windows]
 
     steps:
     - uses: actions/checkout@v1
@@ -67,30 +77,8 @@ jobs:
     - run: tests/check-version.sh 'node' 'v12.16.1'
     - run: tests/check-version.sh 'yarn' '1.19.1'
 
-  test-specific-volta:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
-
-    steps:
-    - uses: actions/checkout@v1
-
-    - run: npm ci
-    - run: npm run build
-    - uses: ./
-      with:
-        volta-version: 0.7.0
-
-    - run: tests/log-info.sh
-    - run: tests/check-version.sh 'volta' '0.7.0'
-    - run: volta install node@12.16.1 yarn@1.19.1
-    - run: tests/check-version.sh 'node' 'v12.16.1'
-    - run: tests/check-version.sh 'yarn' '1.19.1'
-
   test-specified-node-yarn-overrides-pinned-versions:
-    runs-on: ${{ matrix.os }}
+    runs-on: "${{ matrix.os }}-latest"
 
     defaults:
       run:
@@ -98,7 +86,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu, macOS, windows]
 
     steps:
     - uses: actions/checkout@v2
@@ -122,11 +110,11 @@ jobs:
     - run: tests/check-version.sh 'yarn' '1.22.0'
 
   test-specific-volta-node-yarn:
-    runs-on: ${{ matrix.os }}
+    runs-on: "${{ matrix.os }}-latest"
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu, macOS, windows]
 
     steps:
     - uses: actions/checkout@v1
@@ -135,11 +123,11 @@ jobs:
     - run: npm run build
     - uses: ./
       with:
-        volta-version: 0.7.1
+        volta-version: 0.8.7
         node-version: 12.0.0
         yarn-version: 1.22.0
 
     - run: tests/log-info.sh
-    - run: tests/check-version.sh 'volta' '0.7.1'
+    - run: tests/check-version.sh 'volta' '0.8.7'
     - run: tests/check-version.sh 'node' 'v12.0.0'
     - run: tests/check-version.sh 'yarn' '1.22.0'
