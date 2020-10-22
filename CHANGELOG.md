@@ -1,3 +1,18 @@
+## v1.6.0 (2020-10-22)
+
+#### :rocket: Enhancement
+* [#42](https://github.com/volta-cli/action/pull/42) Add tsc and eslint matchers. ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#43](https://github.com/volta-cli/action/pull/43) Refactor CI config to simplify testing volta 0.6, 0.7, 0.8, and 0.9. ([@rwjblue](https://github.com/rwjblue))
+* [#45](https://github.com/volta-cli/action/pull/45) Update dependencies to latest. ([@rwjblue](https://github.com/rwjblue))
+* [#44](https://github.com/volta-cli/action/pull/44) Update release packages to latest. ([@rwjblue](https://github.com/rwjblue))
+* [#41](https://github.com/volta-cli/action/pull/41) Remove unused walk-sync devDep. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v1.5.0 (2020-10-07)
 
 #### :rocket: Enhancement
