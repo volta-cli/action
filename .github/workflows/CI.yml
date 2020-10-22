@@ -15,11 +15,11 @@ env:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: "${{ matrix.os }}-latest"
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu, macOS, windows]
 
     steps:
     - uses: actions/checkout@v1
@@ -30,16 +30,16 @@ jobs:
     - run: npm test
 
   test-specific-volta:
-    runs-on: ${{ matrix.os }}
+    runs-on: "${{ matrix.os }}-latest"
 
     strategy:
       fail-fast: false
       matrix:
         volta-version: ["0.9.0","0.8.7","0.7.2","0.6.8"]
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu, macOS, windows]
         exclude:
           # this action didn't support windows until at least Volta 0.7
-          - os: windows-latest
+          - os: windows
             volta-version: "0.6.8"
 
     steps:
@@ -58,11 +58,11 @@ jobs:
 
 
   test-no-options:
-    runs-on: ${{ matrix.os }}
+    runs-on: "${{ matrix.os }}-latest"
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu, macOS, windows]
 
     steps:
     - uses: actions/checkout@v1
@@ -78,7 +78,7 @@ jobs:
     - run: tests/check-version.sh 'yarn' '1.19.1'
 
   test-specified-node-yarn-overrides-pinned-versions:
-    runs-on: ${{ matrix.os }}
+    runs-on: "${{ matrix.os }}-latest"
 
     defaults:
       run:
@@ -86,7 +86,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu, macOS, windows]
 
     steps:
     - uses: actions/checkout@v2
@@ -110,11 +110,11 @@ jobs:
     - run: tests/check-version.sh 'yarn' '1.22.0'
 
   test-specific-volta-node-yarn:
-    runs-on: ${{ matrix.os }}
+    runs-on: "${{ matrix.os }}-latest"
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu, macOS, windows]
 
     steps:
     - uses: actions/checkout@v1
