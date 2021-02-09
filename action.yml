@@ -8,6 +8,9 @@ inputs:
   node-version:
     description: 'Version Spec of the node version to use.  Examples: 10.6.x, 10.15.1, >=10.15.0'
     default: ''
+  npm-version:
+    description: 'Version Spec of the npm version to use.  Examples: 7.5.x, 7.5.3, >=7.5.3'
+    default: ''
   yarn-version:
     description: 'Version Spec of the yarn version to use.  Examples: 1.6.x, 10.15.1, >=10.15.0'
     default: ''

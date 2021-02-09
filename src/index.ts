@@ -20,6 +20,17 @@ async function run(): Promise<void> {
       }
     }
 
+    const npmVersion = core.getInput('npm-version', { required: false });
+    if (npmVersion !== '') {
+      core.info(`installing NPM ${npmVersion === 'true' ? '' : npmVersion}`);
+      await installer.installNpm(npmVersion);
+
+      // cannot pin `npm` when `node` is not pinned as well
+      if (nodeVersion !== '' && hasPackageJSON) {
+        await installer.pinNpm(npmVersion);
+      }
+    }
+
     const yarnVersion = core.getInput('yarn-version', { required: false });
     if (yarnVersion !== '') {
       core.info(`installing Yarn ${yarnVersion === 'true' ? '' : yarnVersion}`);

@@ -73,11 +73,12 @@ jobs:
 
     - run: tests/log-info.sh
     - run: tests/check-version.sh 'volta' 'current'
-    - run: volta install node@12.16.1 yarn@1.19.1
+    - run: volta install node@12.16.1 npm@7.5.2 yarn@1.19.1
     - run: tests/check-version.sh 'node' 'v12.16.1'
+    - run: tests/check-version.sh 'npm' '7.5.2'
     - run: tests/check-version.sh 'yarn' '1.19.1'
 
-  test-specified-node-yarn-overrides-pinned-versions:
+  test-specified-node-npm-yarn-overrides-pinned-versions:
     runs-on: "${{ matrix.os }}-latest"
 
     defaults:
@@ -103,13 +104,15 @@ jobs:
     - uses: ./action
       with:
         node-version: 12.14.0
+        npm-version: 7.5.2
         yarn-version: 1.22.0
 
     - run: tests/log-info.sh
     - run: tests/check-version.sh 'node' 'v12.14.0'
+    - run: tests/check-version.sh 'npm' '7.5.2'
     - run: tests/check-version.sh 'yarn' '1.22.0'
 
-  test-specific-volta-node-yarn:
+  test-specific-volta-node-npm-yarn:
     runs-on: "${{ matrix.os }}-latest"
 
     strategy:
@@ -123,11 +126,13 @@ jobs:
     - run: npm run build
     - uses: ./
       with:
-        volta-version: 0.8.7
+        volta-version: 1.0.1
         node-version: 12.0.0
+        npm-version: 7.5.2
         yarn-version: 1.22.0
 
     - run: tests/log-info.sh
-    - run: tests/check-version.sh 'volta' '0.8.7'
+    - run: tests/check-version.sh 'volta' '1.0.1'
     - run: tests/check-version.sh 'node' 'v12.0.0'
+    - run: tests/check-version.sh 'npm' '7.5.2'
     - run: tests/check-version.sh 'yarn' '1.22.0'
