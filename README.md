@@ -54,6 +54,24 @@ steps:
 - run: npm test
 ```
 
+You can also specify the version of npm:
+
+```yaml
+strategy:
+  matrix:
+    node-version: ['^8.12', '10', '12']
+
+steps:
+- uses: actions/checkout@v1
+- uses: volta-cli/action@v1
+  with:
+    node-version: ${{ matrix.node-version }}
+    npm-version: '7'
+
+- run: npm install
+- run: npm test
+```
+
 # License
 
 The scripts and documentation in this project are released under the [MIT License](LICENSE)

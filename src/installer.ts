@@ -168,12 +168,20 @@ export async function installNode(version: string): Promise<void> {
   await execVolta(['install', `node${version === 'true' ? '' : `@${version}`}`]);
 }
 
+export async function installNpm(version: string): Promise<void> {
+  await execVolta(['install', `npm${version === 'true' ? '' : `@${version}`}`]);
+}
+
 export async function installYarn(version: string): Promise<void> {
   await execVolta(['install', `yarn${version === 'true' ? '' : `@${version}`}`]);
 }
 
 export async function pinNode(version: string): Promise<void> {
   await execVolta(['pin', `node${version === 'true' ? '' : `@${version}`}`]);
+}
+
+export async function pinNpm(version: string): Promise<void> {
+  await execVolta(['pin', `npm${version === 'true' ? '' : `@${version}`}`]);
 }
 
 export async function pinYarn(version: string): Promise<void> {
