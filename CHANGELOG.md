@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.7.0 (2021-03-03)
+
+#### :rocket: Enhancement
+* [#53](https://github.com/volta-cli/action/pull/53) Add support for specifying `npm-version` as an option ([@felipecrs](https://github.com/felipecrs))
+
+#### :bug: Bug Fix
+* [#54](https://github.com/volta-cli/action/pull/54) Update `tsc` matcher to associate failure with correct line/column. ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#55](https://github.com/volta-cli/action/pull/55) Update release setup. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 2
+- Felipe Santos ([@felipecrs](https://github.com/felipecrs))
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v1.6.0 (2020-10-22)
 
 #### :rocket: Enhancement

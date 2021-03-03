@@ -17689,6 +17689,15 @@ function run() {
                     yield installer.pinNode(nodeVersion);
                 }
             }
+            const npmVersion = core.getInput('npm-version', { required: false });
+            if (npmVersion !== '') {
+                core.info(`installing NPM ${npmVersion === 'true' ? '' : npmVersion}`);
+                yield installer.installNpm(npmVersion);
+                // cannot pin `npm` when `node` is not pinned as well
+                if (nodeVersion !== '' && hasPackageJSON) {
+                    yield installer.pinNpm(npmVersion);
+                }
+            }
             const yarnVersion = core.getInput('yarn-version', { required: false });
             if (yarnVersion !== '') {
                 core.info(`installing Yarn ${yarnVersion === 'true' ? '' : yarnVersion}`);
@@ -17747,7 +17756,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getVolta = exports.pinYarn = exports.pinNode = exports.installYarn = exports.installNode = exports.execVolta = exports.buildLayout = exports.buildDownloadUrl = void 0;
+exports.getVolta = exports.pinYarn = exports.pinNpm = exports.pinNode = exports.installYarn = exports.installNpm = exports.installNode = exports.execVolta = exports.buildLayout = exports.buildDownloadUrl = void 0;
 const core = __importStar(__webpack_require__(2186));
 const tc = __importStar(__webpack_require__(7784));
 const io = __importStar(__webpack_require__(7436));
@@ -17906,6 +17915,12 @@ function installNode(version) {
     });
 }
 exports.installNode = installNode;
+function installNpm(version) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield execVolta(['install', `npm${version === 'true' ? '' : `@${version}`}`]);
+    });
+}
+exports.installNpm = installNpm;
 function installYarn(version) {
     return __awaiter(this, void 0, void 0, function* () {
         yield execVolta(['install', `yarn${version === 'true' ? '' : `@${version}`}`]);
@@ -17918,6 +17933,12 @@ function pinNode(version) {
     });
 }
 exports.pinNode = pinNode;
+function pinNpm(version) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield execVolta(['pin', `npm${version === 'true' ? '' : `@${version}`}`]);
+    });
+}
+exports.pinNpm = pinNpm;
 function pinYarn(version) {
     return __awaiter(this, void 0, void 0, function* () {
         yield execVolta(['pin', `yarn${version === 'true' ? '' : `@${version}`}`]);
