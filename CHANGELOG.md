@@ -1,3 +1,5 @@
+# Changelog
+
 ## v1.6.0 (2020-10-22)
 
 #### :rocket: Enhancement
