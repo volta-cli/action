@@ -25,7 +25,9 @@
     "lint:types": "tsc --noEmit",
     "test": "jest"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@actions/github": "^5.0.0"
+  },
   "devDependencies": {
     "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.4",

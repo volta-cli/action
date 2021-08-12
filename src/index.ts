@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import findUp from 'find-up';
 import * as installer from './installer';
+import * as registry from './registry';
 import addMatchers from './matchers';
 
 async function run(): Promise<void> {
@@ -40,6 +41,13 @@ async function run(): Promise<void> {
       if (nodeVersion !== '' && hasPackageJSON) {
         await installer.pinYarn(yarnVersion);
       }
+    }
+
+    const registryUrl = core.getInput('registry-url', { required: false });
+    const alwaysAuth = core.getInput('always-auth', { required: false });
+    if (registryUrl !== '') {
+      core.info(`setting up registry url: ${registryUrl}`);
+      await registry.configAuthentication(registryUrl, alwaysAuth);
     }
 
     await addMatchers();

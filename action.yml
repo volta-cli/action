@@ -14,6 +14,11 @@ inputs:
   yarn-version:
     description: 'Version Spec of the yarn version to use.  Examples: 1.6.x, 10.15.1, >=10.15.0'
     default: ''
+  registry-url:
+    description: 'Optional registry to set up for auth. Will set the registry in a project level .npmrc file, and set up auth to read in from env.NODE_AUTH_TOKEN'
+  always-auth:
+    description: 'Set always-auth in npmrc'
+    default: 'false'
 branding:
   icon: 'zap'
   color: 'yellow'
