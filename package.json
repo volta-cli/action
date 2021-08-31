@@ -29,11 +29,11 @@
     "@actions/github": "^5.0.0"
   },
   "devDependencies": {
-    "@actions/core": "^1.2.6",
-    "@actions/exec": "^1.0.4",
-    "@actions/glob": "^0.1.0",
-    "@actions/io": "^1.0.2",
-    "@actions/tool-cache": "^1.6.0",
+    "@actions/core": "^1.5.0",
+    "@actions/exec": "^1.1.0",
+    "@actions/glob": "^0.2.0",
+    "@actions/io": "^1.1.1",
+    "@actions/tool-cache": "^1.7.1",
     "@types/jest": "^26.0.15",
     "@types/node": "^14.14.2",
     "@types/semver": "^7.3.4",
