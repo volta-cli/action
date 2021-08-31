@@ -136,3 +136,26 @@ jobs:
     - run: tests/check-version.sh 'node' 'v12.0.0'
     - run: tests/check-version.sh 'npm' '7.5.2'
     - run: tests/check-version.sh 'yarn' '1.22.0'
+
+  test-specified-registry-url:
+    runs-on: "${{ matrix.os }}-latest"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu, macOS, windows]
+
+    steps:
+    - uses: actions/checkout@v1
+    - run: npm ci
+    - run: npm run build
+    - uses: ./
+      with:
+        registry-url: "https://some.path.here.com/lol/"
+
+    - run: tests/log-info.sh
+    - run: tests/check-version.sh 'volta' 'current'
+    - run: volta install node@10.17.0 yarn@1.19.0
+    - run: tests/check-version.sh 'node' 'v10.17.0'
+    - run: tests/check-version.sh 'yarn' '1.19.0'
+    - run: tests/check-registry.sh 'https://some.path.here.com/lol/'
