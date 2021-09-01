@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import findUp from 'find-up';
+import { findUp } from 'find-up';
 import * as installer from './installer';
 import * as registry from './registry';
 import addMatchers from './matchers';

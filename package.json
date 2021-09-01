@@ -45,7 +45,7 @@
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "find-up": "^5.0.0",
+    "find-up": "^6.0.0",
     "got": "^11.8.0",
     "jest": "^27.1.0",
     "jest-circus": "^27.1.0",
