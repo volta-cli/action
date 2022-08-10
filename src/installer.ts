@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
 import * as io from '@actions/io';
-import { exec } from '@actions/exec';
+import { exec, ExecOptions } from '@actions/exec';
 import got from 'got';
 import * as os from 'os';
 import * as path from 'path';
@@ -21,15 +21,22 @@ function voltaVersionHasSetup(version: string): boolean {
   return semver.gte(version, '0.7.0');
 }
 
-export function buildDownloadUrl(platform: string, version: string): string {
+export async function buildDownloadUrl(
+  platform: string,
+  version: string,
+  openSSLVersion = ''
+): Promise<string> {
   let fileName: string;
   switch (platform) {
     case 'darwin':
       fileName = `volta-${version}-macos.tar.gz`;
       break;
-    case 'linux':
-      fileName = `volta-${version}-linux-openssl-1.1.tar.gz`;
+    case 'linux': {
+      openSSLVersion = await getOpenSSLVersion(openSSLVersion);
+
+      fileName = `volta-${version}-linux-${openSSLVersion}.tar.gz`;
       break;
+    }
     case 'win32':
       fileName = `volta-${version}-windows-x86_64.msi`;
       break;
@@ -38,6 +45,42 @@ export function buildDownloadUrl(platform: string, version: string): string {
   }
 
   return `https://github.com/volta-cli/volta/releases/download/v${version}/${fileName}`;
+}
+
+async function execOpenSSLVersion() {
+  let output = '';
+  const options: ExecOptions = {};
+  options.listeners = {
+    stdout: (data: Buffer) => {
+      output += data.toString();
+    },
+    stderr: (data: Buffer) => {
+      output += data.toString();
+    },
+  };
+
+  await exec('openssl version', [], options);
+
+  return output;
+}
+
+async function getOpenSSLVersion(version = ''): Promise<string> {
+  if (version === '') {
+    version = await execOpenSSLVersion();
+  }
+
+  // typical version string looks like 'OpenSSL 1.0.1e-fips 11 Feb 2013'
+  const openSSLVersionPattern = /^([^\s]*)\s([0-9]+\.[0-9]+)/;
+  const match = openSSLVersionPattern.exec(version);
+
+  if (match === null) {
+    throw new Error(
+      `No version of OpenSSL was found. @volta-cli/action requires a valid version of OpenSSL. ('openssl version' output: ${version})`
+    );
+  }
+
+  // should return in openssl-1.1 format
+  return `openssl-${match[2]}`;
 }
 
 /*
@@ -95,7 +138,7 @@ async function acquireVolta(version: string): Promise<string> {
 
   core.info(`downloading volta@${version}`);
 
-  const downloadUrl = buildDownloadUrl(os.platform(), version);
+  const downloadUrl = await buildDownloadUrl(os.platform(), version);
 
   core.debug(`downloading from \`${downloadUrl}\``);
   const downloadPath = await tc.downloadTool(downloadUrl);
