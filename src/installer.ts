@@ -21,36 +21,6 @@ function voltaVersionHasSetup(version: string): boolean {
   return semver.gte(version, '0.7.0');
 }
 
-async function getOpenSSLVersion(version = ''): Promise<string> {
-  if (version === '') {
-    let output = '';
-    const options: ExecOptions = {};
-    options.listeners = {
-      stdout: (data: Buffer) => {
-        output += data.toString();
-      },
-      stderr: (data: Buffer) => {
-        output += data.toString();
-      },
-    };
-
-    await exec('openssl version', [], options);
-
-    version = output;
-  }
-
-  // typical version string looks like 'OpenSSL 1.0.1e-fips 11 Feb 2013'
-  const openSSLVersionPattern = /^([^\s]*)\s([0-9]+\.[0-9]+)/;
-  const match = openSSLVersionPattern.exec(version);
-
-  if (match === null) {
-    throw new Error('No version of OpenSSL was found. Volta requires a valid version of OpenSSL.');
-  }
-
-  // should return in openssl-1.1 format
-  return `openssl-${match[2]}`;
-}
-
 export async function buildDownloadUrl(
   platform: string,
   version: string,
@@ -75,6 +45,42 @@ export async function buildDownloadUrl(
   }
 
   return `https://github.com/volta-cli/volta/releases/download/v${version}/${fileName}`;
+}
+
+async function execOpenSSLVersion() {
+  let output = '';
+  const options: ExecOptions = {};
+  options.listeners = {
+    stdout: (data: Buffer) => {
+      output += data.toString();
+    },
+    stderr: (data: Buffer) => {
+      output += data.toString();
+    },
+  };
+
+  await exec('openssl version', [], options);
+
+  return output;
+}
+
+async function getOpenSSLVersion(version = ''): Promise<string> {
+  if (version === '') {
+    version = await execOpenSSLVersion();
+  }
+
+  // typical version string looks like 'OpenSSL 1.0.1e-fips 11 Feb 2013'
+  const openSSLVersionPattern = /^([^\s]*)\s([0-9]+\.[0-9]+)/;
+  const match = openSSLVersionPattern.exec(version);
+
+  if (match === null) {
+    throw new Error(
+      `No version of OpenSSL was found. @volta-cli/action requires a valid version of OpenSSL. ('openssl version' output: ${version})`
+    );
+  }
+
+  // should return in openssl-1.1 format
+  return `openssl-${match[2]}`;
 }
 
 /*
