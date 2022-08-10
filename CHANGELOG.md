@@ -1,5 +1,22 @@
 # Changelog
 
+## v2.0.0 (2022-08-10)
+
+#### :boom: Breaking Change
+* [#89](https://github.com/volta-cli/action/pull/89) Fix usage on Linux distributions other than Ubuntu (e.g. CentOS, RHEL, &c) ([@scalvert](https://github.com/scalvert))
+
+#### :rocket: Enhancement
+* [#64](https://github.com/volta-cli/action/pull/64) Adds registry-url and always-auth parameters ([@pzuraq](https://github.com/pzuraq))
+
+#### :bug: Bug Fix
+* [#89](https://github.com/volta-cli/action/pull/89) Fix usage on Linux distributions other than Ubuntu (e.g. CentOS, RHEL, &c) ([@scalvert](https://github.com/scalvert))
+
+#### Committers: 3
+- Chris Garrett ([@pzuraq](https://github.com/pzuraq))
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- Steve Calvert ([@scalvert](https://github.com/scalvert))
+
+
 ## v1.7.0 (2021-03-03)
 
 #### :rocket: Enhancement
