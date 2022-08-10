@@ -2,28 +2,36 @@ import { buildLayout, buildDownloadUrl } from './installer';
 import { createTempDir } from 'broccoli-test-helper';
 
 describe('buildDownloadUrl', () => {
-  test('darwin', function () {
-    expect(buildDownloadUrl('darwin', '0.6.4')).toMatchInlineSnapshot(
+  test('darwin', async function () {
+    expect(await buildDownloadUrl('darwin', '0.6.4')).toMatchInlineSnapshot(
       `"https://github.com/volta-cli/volta/releases/download/v0.6.4/volta-0.6.4-macos.tar.gz"`
     );
   });
 
-  test('linux', function () {
-    expect(buildDownloadUrl('linux', '0.6.4')).toMatchInlineSnapshot(
+  test('linux', async function () {
+    expect(
+      await buildDownloadUrl('linux', '0.6.4', 'OpenSSL 1.0.1e-fips 11 Feb 2013')
+    ).toMatchInlineSnapshot(
+      `"https://github.com/volta-cli/volta/releases/download/v0.6.4/volta-0.6.4-linux-openssl-1.0.tar.gz"`
+    );
+
+    expect(
+      await buildDownloadUrl('linux', '0.6.4', 'OpenSSL 1.1.1e-fips 11 Sep 2018')
+    ).toMatchInlineSnapshot(
       `"https://github.com/volta-cli/volta/releases/download/v0.6.4/volta-0.6.4-linux-openssl-1.1.tar.gz"`
     );
   });
 
-  test('win32', function () {
-    expect(buildDownloadUrl('win32', '0.7.2')).toMatchInlineSnapshot(
+  test('win32', async function () {
+    expect(await buildDownloadUrl('win32', '0.7.2')).toMatchInlineSnapshot(
       `"https://github.com/volta-cli/volta/releases/download/v0.7.2/volta-0.7.2-windows-x86_64.msi"`
     );
   });
 
-  test('aix', function () {
-    expect(() => buildDownloadUrl('aix', '0.6.4')).toThrowErrorMatchingInlineSnapshot(
-      `"your platform aix is not yet supported"`
-    );
+  test('aix', async function () {
+    expect(
+      async () => await buildDownloadUrl('aix', '0.6.4')
+    ).rejects.toThrowErrorMatchingInlineSnapshot(`"your platform aix is not yet supported"`);
   });
 });
 
