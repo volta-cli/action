@@ -13,6 +13,10 @@ defaults:
 env:
   NODE_OPTIONS: '--unhandled-rejections=strict'
 
+concurrency:
+  group: ci-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: "${{ matrix.os }}-latest"
