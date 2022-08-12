@@ -43,12 +43,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        volta-version: ["0.9.0","0.8.7","0.7.2","0.6.8"]
+        volta-version: ["1.0.0", "1.0.8"]
         os: [ubuntu, macOS, windows]
-        exclude:
-          # this action didn't support windows until at least Volta 0.7
-          - os: windows
-            volta-version: "0.6.8"
 
     steps:
     - uses: actions/checkout@v3

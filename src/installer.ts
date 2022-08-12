@@ -231,13 +231,25 @@ export async function pinYarn(version: string): Promise<void> {
   await execVolta(['pin', `yarn${version === 'true' ? '' : `@${version}`}`]);
 }
 
-export async function getVolta(versionSpec: string): Promise<void> {
+export async function getVoltaVersion(versionSpec: string): Promise<string> {
   let version = semver.clean(versionSpec) || '';
+  const validVersionProvided = semver.valid(version) !== null;
 
-  // If explicit version
-  if (semver.valid(version) === null) {
+  if (validVersionProvided && semver.lt(version, '1.0.0')) {
+    throw new Error(
+      `volta-cli/action: Volta version must be >= 1.0.0 (you specified ${versionSpec})`
+    );
+  }
+
+  if (!validVersionProvided) {
     version = await getLatestVolta();
   }
+
+  return version;
+}
+
+export async function getVolta(versionSpec: string): Promise<void> {
+  const version = await getVoltaVersion(versionSpec);
 
   let voltaHome = tc.find('volta', version);
 
