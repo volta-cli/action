@@ -26,7 +26,7 @@ jobs:
         os: [ubuntu, macOS, windows]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
 
     - run: npm ci
     - run: npm run lint
@@ -35,6 +35,10 @@ jobs:
 
   test-specific-volta:
     runs-on: "${{ matrix.os }}-latest"
+
+    defaults:
+      run:
+        working-directory: ./action
 
     strategy:
       fail-fast: false
@@ -47,10 +51,12 @@ jobs:
             volta-version: "0.6.8"
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
+      with:
+        path: action
     - run: npm ci
     - run: npm run build
-    - uses: ./
+    - uses: ./action
       with:
         volta-version: ${{ matrix.volta-version }}
 
@@ -64,16 +70,22 @@ jobs:
   test-no-options:
     runs-on: "${{ matrix.os }}-latest"
 
+    defaults:
+      run:
+        working-directory: ./action
+
     strategy:
       matrix:
         os: [ubuntu, macOS, windows]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
+      with:
+        path: action
 
     - run: npm ci
     - run: npm run build
-    - uses: ./
+    - uses: ./action
 
     - run: tests/log-info.sh
     - run: tests/check-version.sh 'volta' 'current'
@@ -94,11 +106,11 @@ jobs:
         os: [ubuntu, macOS, windows]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         ref: 'branch-for-testing-overriding-pinned-projects-in-ci'
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         path: action
 
@@ -119,16 +131,21 @@ jobs:
   test-specific-volta-node-npm-yarn:
     runs-on: "${{ matrix.os }}-latest"
 
+    defaults:
+      run:
+        working-directory: ./action
+
     strategy:
       matrix:
         os: [ubuntu, macOS, windows]
 
     steps:
-    - uses: actions/checkout@v1
-
+    - uses: actions/checkout@v3
+      with:
+        path: action
     - run: npm ci
     - run: npm run build
-    - uses: ./
+    - uses: ./action
       with:
         volta-version: 1.0.1
         node-version: 12.0.0
@@ -144,16 +161,23 @@ jobs:
   test-specified-registry-url:
     runs-on: "${{ matrix.os }}-latest"
 
+    defaults:
+      run:
+        working-directory: ./action
+
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu, macOS, windows]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
+      with:
+        path: action
+
     - run: npm ci
     - run: npm run build
-    - uses: ./
+    - uses: ./action
       with:
         registry-url: "https://some.path.here.com/lol/"
 
