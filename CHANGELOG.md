@@ -1,5 +1,15 @@
 # Changelog
 
+
+## v2.0.1 (2022-08-12)
+
+#### :house: Internal
+* [#86](https://github.com/volta-cli/action/pull/86) Update dependencies / devDependencies to latest ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v2.0.0 (2022-08-10)
 
 #### :boom: Breaking Change
