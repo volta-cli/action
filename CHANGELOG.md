@@ -1,6 +1,16 @@
 # Changelog
 
 
+## v2.0.2 (2022-08-17)
+
+#### :bug: Bug Fix
+* [#95](https://github.com/volta-cli/action/pull/95) Add `scope` to list of inputs ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
+
 ## v2.0.1 (2022-08-12)
 
 #### :house: Internal
