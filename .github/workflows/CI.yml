@@ -36,10 +36,6 @@ jobs:
   test-specific-volta:
     runs-on: "${{ matrix.os }}-latest"
 
-    defaults:
-      run:
-        working-directory: ./action
-
     strategy:
       fail-fast: false
       matrix:
@@ -51,24 +47,22 @@ jobs:
       with:
         path: action
     - run: npm ci
+      working-directory: ./action
     - run: npm run build
+      working-directory: ./action
     - uses: ./action
       with:
         volta-version: ${{ matrix.volta-version }}
 
-    - run: tests/log-info.sh
-    - run: tests/check-version.sh 'volta' ${{ matrix.volta-version }}
+    - run: ./action/tests/log-info.sh
+    - run: ./action/tests/check-version.sh 'volta' ${{ matrix.volta-version }}
     - run: volta install node@10.17.0 yarn@1.19.0
-    - run: tests/check-version.sh 'node' 'v10.17.0'
-    - run: tests/check-version.sh 'yarn' '1.19.0'
+    - run: ./action/tests/check-version.sh 'node' 'v10.17.0'
+    - run: ./action/tests/check-version.sh 'yarn' '1.19.0'
 
 
   test-no-options:
     runs-on: "${{ matrix.os }}-latest"
-
-    defaults:
-      run:
-        working-directory: ./action
 
     strategy:
       matrix:
@@ -80,22 +74,20 @@ jobs:
         path: action
 
     - run: npm ci
+      working-directory: ./action
     - run: npm run build
+      working-directory: ./action
     - uses: ./action
 
-    - run: tests/log-info.sh
-    - run: tests/check-version.sh 'volta' 'current'
+    - run: ./action/tests/log-info.sh
+    - run: ./action/tests/check-version.sh 'volta' 'current'
     - run: volta install node@12.16.1 npm@7.5.2 yarn@1.19.1
-    - run: tests/check-version.sh 'node' 'v12.16.1'
-    - run: tests/check-version.sh 'npm' '7.5.2'
-    - run: tests/check-version.sh 'yarn' '1.19.1'
+    - run: ./action/tests/check-version.sh 'node' 'v12.16.1'
+    - run: ./action/tests/check-version.sh 'npm' '7.5.2'
+    - run: ./action/tests/check-version.sh 'yarn' '1.19.1'
 
   test-specified-node-npm-yarn-overrides-pinned-versions:
     runs-on: "${{ matrix.os }}-latest"
-
-    defaults:
-      run:
-        working-directory: ./action
 
     strategy:
       matrix:
@@ -111,7 +103,9 @@ jobs:
         path: action
 
     - run: npm ci
+      working-directory: ./action
     - run: npm run build
+      working-directory: ./action
 
     - uses: ./action
       with:
@@ -119,17 +113,13 @@ jobs:
         npm-version: 7.5.2
         yarn-version: 1.22.0
 
-    - run: tests/log-info.sh
-    - run: tests/check-version.sh 'node' 'v12.14.0'
-    - run: tests/check-version.sh 'npm' '7.5.2'
-    - run: tests/check-version.sh 'yarn' '1.22.0'
+    - run: ./action/tests/log-info.sh
+    - run: ./action/tests/check-version.sh 'node' 'v12.14.0'
+    - run: ./action/tests/check-version.sh 'npm' '7.5.2'
+    - run: ./action/tests/check-version.sh 'yarn' '1.22.0'
 
   test-specific-volta-node-npm-yarn:
     runs-on: "${{ matrix.os }}-latest"
-
-    defaults:
-      run:
-        working-directory: ./action
 
     strategy:
       matrix:
@@ -140,7 +130,9 @@ jobs:
       with:
         path: action
     - run: npm ci
+      working-directory: ./action
     - run: npm run build
+      working-directory: ./action
     - uses: ./action
       with:
         volta-version: 1.0.1
@@ -148,18 +140,14 @@ jobs:
         npm-version: 7.5.2
         yarn-version: 1.22.0
 
-    - run: tests/log-info.sh
-    - run: tests/check-version.sh 'volta' '1.0.1'
-    - run: tests/check-version.sh 'node' 'v12.0.0'
-    - run: tests/check-version.sh 'npm' '7.5.2'
-    - run: tests/check-version.sh 'yarn' '1.22.0'
+    - run: ./action/tests/log-info.sh
+    - run: ./action/tests/check-version.sh 'volta' '1.0.1'
+    - run: ./action/tests/check-version.sh 'node' 'v12.0.0'
+    - run: ./action/tests/check-version.sh 'npm' '7.5.2'
+    - run: ./action/tests/check-version.sh 'yarn' '1.22.0'
 
   test-specified-registry-url:
     runs-on: "${{ matrix.os }}-latest"
-
-    defaults:
-      run:
-        working-directory: ./action
 
     strategy:
       fail-fast: false
@@ -172,14 +160,16 @@ jobs:
         path: action
 
     - run: npm ci
+      working-directory: ./action
     - run: npm run build
+      working-directory: ./action
     - uses: ./action
       with:
         registry-url: "https://some.path.here.com/lol/"
 
-    - run: tests/log-info.sh
-    - run: tests/check-version.sh 'volta' 'current'
+    - run: ./action/tests/log-info.sh
+    - run: ./action/tests/check-version.sh 'volta' 'current'
     - run: volta install node@10.17.0 yarn@1.19.0
-    - run: tests/check-version.sh 'node' 'v10.17.0'
-    - run: tests/check-version.sh 'yarn' '1.19.0'
-    - run: tests/check-registry.sh 'https://some.path.here.com/lol/'
+    - run: ./action/tests/check-version.sh 'node' 'v10.17.0'
+    - run: ./action/tests/check-version.sh 'yarn' '1.19.0'
+    - run: ./action/tests/check-registry.sh 'https://some.path.here.com/lol/'
