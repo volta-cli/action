@@ -1,6 +1,29 @@
 # Changelog
 
 
+
+## v3.0.0-beta.1 (2022-08-18)
+
+#### :boom: Breaking Change
+* [#93](https://github.com/volta-cli/action/pull/93) Drop support for usage with Volta older than 1.0.0 ([@rwjblue](https://github.com/rwjblue))
+* [#75](https://github.com/volta-cli/action/pull/75) Output ESM into dist/ ([@rwjblue](https://github.com/rwjblue))
+* [#91](https://github.com/volta-cli/action/pull/91) Update action metadata to leverage Node 16 ([@rwjblue](https://github.com/rwjblue))
+
+#### :rocket: Enhancement
+* [#97](https://github.com/volta-cli/action/pull/97) Use `${{ github.token }}` to authenticate tool cache downloads ([@rwjblue](https://github.com/rwjblue))
+
+#### :bug: Bug Fix
+* [#95](https://github.com/volta-cli/action/pull/95) Add `scope` to list of inputs ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#46](https://github.com/volta-cli/action/pull/46) Update to npm@8 ([@rwjblue](https://github.com/rwjblue))
+* [#96](https://github.com/volta-cli/action/pull/96) Prevent test harness from defaulting to `./action` as default working directory ([@rwjblue](https://github.com/rwjblue))
+* [#92](https://github.com/volta-cli/action/pull/92) Migrate CI jobs to checkout `action` into subdirectory ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v2.0.1 (2022-08-12)
 
 #### :house: Internal
