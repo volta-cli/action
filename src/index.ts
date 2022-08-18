@@ -6,9 +6,10 @@ import addMatchers from './matchers';
 
 async function run(): Promise<void> {
   try {
+    const authToken = core.getInput('token', { required: false });
     const voltaVersion = core.getInput('volta-version', { required: false });
 
-    await installer.getVolta(voltaVersion);
+    await installer.getVolta(voltaVersion, authToken);
 
     const hasPackageJSON = await findUp('package.json');
     const nodeVersion = core.getInput('node-version', { required: false });

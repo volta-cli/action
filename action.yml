@@ -18,6 +18,9 @@ inputs:
     description: 'Optional registry to set up for auth. Will set the registry in a project level .npmrc file, and set up auth to read in from env.NODE_AUTH_TOKEN'
   scope:
     description: 'Optional scope for authenticating against scoped registries. Will fall back to the repository owner when using the GitHub Packages registry (https://npm.pkg.github.com/).'
+  token:
+    description: Used to avoid low rate limiting for cached tool downloads.  Since there's a default, this is typically not supplied by the user.
+    default: ${{ github.token }}
   always-auth:
     description: 'Set always-auth in npmrc'
     default: 'false'

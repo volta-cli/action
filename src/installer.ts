@@ -131,7 +131,7 @@ export async function buildLayout(voltaHome: string): Promise<void> {
   await setupShims(voltaHome);
 }
 
-async function acquireVolta(version: string): Promise<string> {
+async function acquireVolta(version: string, authToken: string): Promise<string> {
   //
   // Download - a tool installer intimately knows how to get the tool (and construct urls)
   //
@@ -141,7 +141,7 @@ async function acquireVolta(version: string): Promise<string> {
   const downloadUrl = await buildDownloadUrl(os.platform(), version);
 
   core.debug(`downloading from \`${downloadUrl}\``);
-  const downloadPath = await tc.downloadTool(downloadUrl);
+  const downloadPath = await tc.downloadTool(downloadUrl, undefined, authToken);
 
   const voltaHome = path.join(
     // `RUNNER_TEMP` is used by @actions/tool-cache
@@ -155,6 +155,7 @@ async function acquireVolta(version: string): Promise<string> {
   // Extract
   //
   const voltaHomeBin = path.join(voltaHome, 'bin');
+  core.debug(`extracting from \`${downloadPath}\` into \`${voltaHomeBin}\``);
   if (os.platform() === 'win32') {
     const tmpExtractTarget = path.join(
       // `RUNNER_TEMP` is used by @actions/tool-cache
@@ -241,21 +242,24 @@ export async function getVoltaVersion(versionSpec: string): Promise<string> {
     );
   }
 
-  if (!validVersionProvided) {
+  if (validVersionProvided) {
+    core.info(`using user provided version volta@${version}`);
+  } else {
+    core.info(`looking up latest volta version from https://volta.sh/latest-version`);
     version = await getLatestVolta();
   }
 
   return version;
 }
 
-export async function getVolta(versionSpec: string): Promise<void> {
+export async function getVolta(versionSpec: string, authToken: string): Promise<void> {
   const version = await getVoltaVersion(versionSpec);
 
   let voltaHome = tc.find('volta', version);
 
   if (voltaHome === '') {
     // download, extract, cache
-    const toolRoot = await acquireVolta(version);
+    const toolRoot = await acquireVolta(version, authToken);
 
     await setupVolta(version, toolRoot);
 
