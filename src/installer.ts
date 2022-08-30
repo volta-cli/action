@@ -65,22 +65,28 @@ async function execOpenSSLVersion() {
 }
 
 async function getOpenSSLVersion(version = ''): Promise<string> {
-  if (version === '') {
-    version = await execOpenSSLVersion();
-  }
+  const specificVersionViaInput = /^\d{1,3}\.\d{1,3}$/.test(version);
 
-  // typical version string looks like 'OpenSSL 1.0.1e-fips 11 Feb 2013'
-  const openSSLVersionPattern = /^([^\s]*)\s([0-9]+\.[0-9]+)/;
-  const match = openSSLVersionPattern.exec(version);
+  if (!specificVersionViaInput) {
+    if (version === '') {
+      version = await execOpenSSLVersion();
+    }
 
-  if (match === null) {
-    throw new Error(
-      `No version of OpenSSL was found. @volta-cli/action requires a valid version of OpenSSL. ('openssl version' output: ${version})`
-    );
+    // typical version string looks like 'OpenSSL 1.0.1e-fips 11 Feb 2013'
+    const openSSLVersionPattern = /^([^\s]*)\s([0-9]+\.[0-9]+)/;
+    const match = openSSLVersionPattern.exec(version);
+
+    if (match === null) {
+      throw new Error(
+        `No version of OpenSSL was found. @volta-cli/action requires a valid version of OpenSSL. ('openssl version' output: ${version})`
+      );
+    }
+
+    version = match[2];
   }
 
   // should return in openssl-1.1 format
-  return `openssl-${match[2]}`;
+  return `openssl-${version}`;
 }
 
 /*
@@ -131,14 +137,18 @@ export async function buildLayout(voltaHome: string): Promise<void> {
   await setupShims(voltaHome);
 }
 
-async function acquireVolta(version: string, authToken: string): Promise<string> {
+async function acquireVolta(
+  version: string,
+  authToken: string,
+  openSSLVersion: string
+): Promise<string> {
   //
   // Download - a tool installer intimately knows how to get the tool (and construct urls)
   //
 
   core.info(`downloading volta@${version}`);
 
-  const downloadUrl = await buildDownloadUrl(os.platform(), version);
+  const downloadUrl = await buildDownloadUrl(os.platform(), version, openSSLVersion);
 
   core.debug(`downloading from \`${downloadUrl}\``);
   const downloadPath = await tc.downloadTool(downloadUrl, undefined, authToken);
@@ -252,14 +262,18 @@ export async function getVoltaVersion(versionSpec: string): Promise<string> {
   return version;
 }
 
-export async function getVolta(versionSpec: string, authToken: string): Promise<void> {
+export async function getVolta(
+  versionSpec: string,
+  authToken: string,
+  openSSLVersion: string
+): Promise<void> {
   const version = await getVoltaVersion(versionSpec);
 
   let voltaHome = tc.find('volta', version);
 
   if (voltaHome === '') {
     // download, extract, cache
-    const toolRoot = await acquireVolta(version, authToken);
+    const toolRoot = await acquireVolta(version, authToken, openSSLVersion);
 
     await setupVolta(version, toolRoot);
 
