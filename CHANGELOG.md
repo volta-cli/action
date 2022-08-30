@@ -2,6 +2,15 @@
 
 
 
+## v3.0.1 (2022-08-30)
+
+#### :memo: Documentation
+* [#99](https://github.com/volta-cli/action/pull/99) Update README to include current versions ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v3.0.0 (2022-08-30)
 #
 #### :boom: Breaking Change
