@@ -67,23 +67,25 @@ async function execOpenSSLVersion() {
 async function getOpenSSLVersion(version = ''): Promise<string> {
   const specificVersionViaInput = /^\d{1,3}\.\d{1,3}$/.test(version);
 
-  if (!specificVersionViaInput) {
-    if (version === '') {
-      version = await execOpenSSLVersion();
-    }
-
-    // typical version string looks like 'OpenSSL 1.0.1e-fips 11 Feb 2013'
-    const openSSLVersionPattern = /^([^\s]*)\s([0-9]+\.[0-9]+)/;
-    const match = openSSLVersionPattern.exec(version);
-
-    if (match === null) {
-      throw new Error(
-        `No version of OpenSSL was found. @volta-cli/action requires a valid version of OpenSSL. ('openssl version' output: ${version})`
-      );
-    }
-
-    version = match[2];
+  if (specificVersionViaInput) {
+    return `openssl-${version}`;
   }
+
+  if (version === '') {
+    version = await execOpenSSLVersion();
+  }
+
+  // typical version string looks like 'OpenSSL 1.0.1e-fips 11 Feb 2013'
+  const openSSLVersionPattern = /^([^\s]*)\s([0-9]+\.[0-9]+)/;
+  const match = openSSLVersionPattern.exec(version);
+
+  if (match === null) {
+    throw new Error(
+      `No version of OpenSSL was found. @volta-cli/action requires a valid version of OpenSSL. ('openssl version' output: ${version})`
+    );
+  }
+
+  version = match[2];
 
   // should return in openssl-1.1 format
   return `openssl-${version}`;
