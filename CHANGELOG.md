@@ -2,6 +2,15 @@
 
 
 
+## v3.0.0-beta.2 (2022-08-30)
+
+#### :rocket: Enhancement
+* [#98](https://github.com/volta-cli/action/pull/98) Allow explicitly specifying `openssl-version` (on self-hosted environments the `openssl` command may not be on `$PATH`) ([@scalvert](https://github.com/scalvert))
+
+#### Committers: 1
+- Steve Calvert ([@scalvert](https://github.com/scalvert))
+
+
 ## v3.0.0-beta.1 (2022-08-18)
 
 #### :boom: Breaking Change

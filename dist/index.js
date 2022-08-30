@@ -30571,6 +30571,10 @@ async function execOpenSSLVersion() {
     return output;
 }
 async function getOpenSSLVersion(version = '') {
+    const specificVersionViaInput = /^\d{1,3}\.\d{1,3}$/.test(version);
+    if (specificVersionViaInput) {
+        return `openssl-${version}`;
+    }
     if (version === '') {
         version = await execOpenSSLVersion();
     }
@@ -30580,8 +30584,9 @@ async function getOpenSSLVersion(version = '') {
     if (match === null) {
         throw new Error(`No version of OpenSSL was found. @volta-cli/action requires a valid version of OpenSSL. ('openssl version' output: ${version})`);
     }
+    version = match[2];
     // should return in openssl-1.1 format
-    return `openssl-${match[2]}`;
+    return `openssl-${version}`;
 }
 /*
  * Used to setup a specific shim when running volta < 0.7
@@ -30626,12 +30631,12 @@ async function buildLayout(voltaHome) {
     await io.mkdirP(external_path_.join(voltaHome, 'tools/user'));
     await setupShims(voltaHome);
 }
-async function acquireVolta(version, authToken) {
+async function acquireVolta(version, authToken, openSSLVersion) {
     //
     // Download - a tool installer intimately knows how to get the tool (and construct urls)
     //
     core.info(`downloading volta@${version}`);
-    const downloadUrl = await buildDownloadUrl(external_os_.platform(), version);
+    const downloadUrl = await buildDownloadUrl(external_os_.platform(), version, openSSLVersion);
     core.debug(`downloading from \`${downloadUrl}\``);
     const downloadPath = await tool_cache.downloadTool(downloadUrl, undefined, authToken);
     const voltaHome = external_path_.join(
@@ -30717,12 +30722,12 @@ async function getVoltaVersion(versionSpec) {
     }
     return version;
 }
-async function getVolta(versionSpec, authToken) {
+async function getVolta(versionSpec, authToken, openSSLVersion) {
     const version = await getVoltaVersion(versionSpec);
     let voltaHome = tool_cache.find('volta', version);
     if (voltaHome === '') {
         // download, extract, cache
-        const toolRoot = await acquireVolta(version, authToken);
+        const toolRoot = await acquireVolta(version, authToken, openSSLVersion);
         await setupVolta(version, toolRoot);
         // Install into the local tool cache - node extracts with a root folder
         // that matches the fileName downloaded
@@ -30817,7 +30822,8 @@ async function run() {
     try {
         const authToken = core.getInput('token', { required: false });
         const voltaVersion = core.getInput('volta-version', { required: false });
-        await getVolta(voltaVersion, authToken);
+        const openSSLVersion = core.getInput('openssl-version', { required: false });
+        await getVolta(voltaVersion, authToken, openSSLVersion);
         const hasPackageJSON = await find_up_default()('package.json');
         const nodeVersion = core.getInput('node-version', { required: false });
         if (nodeVersion !== '') {
