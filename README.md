@@ -17,8 +17,8 @@ Basic (when the project's `package.json` has a `volta` property with `node` and/
 
 ```yaml
 steps:
-- uses: actions/checkout@v1
-- uses: volta-cli/action@v1
+- uses: actions/checkout@v3
+- uses: volta-cli/action@v3
 - run: npm install
 - run: npm test
 ```
@@ -27,10 +27,10 @@ Manually specifying node and/or yarn versions (e.g. to test a project without `v
 
 ```yaml
 steps:
-- uses: actions/checkout@v1
-- uses: volta-cli/action@v1
+- uses: actions/checkout@v3
+- uses: volta-cli/action@v3
   with:
-    node-version: 10.x
+    node-version: 18.x
     yarn-version: 1.19.1
 
 - run: yarn install
@@ -42,11 +42,11 @@ Setting up a matrix of node versions:
 ```yaml
 strategy:
   matrix:
-    node-version: ['^8.12', '10', '12']
+    node-version: ['^14.10', '16', '18']
 
 steps:
-- uses: actions/checkout@v1
-- uses: volta-cli/action@v1
+- uses: actions/checkout@v3
+- uses: volta-cli/action@v3
   with:
     node-version: ${{ matrix.node-version }}
 
@@ -62,8 +62,8 @@ strategy:
     node-version: ['^8.12', '10', '12']
 
 steps:
-- uses: actions/checkout@v1
-- uses: volta-cli/action@v1
+- uses: actions/checkout@v3
+- uses: volta-cli/action@v3
   with:
     node-version: ${{ matrix.node-version }}
     npm-version: '7'
