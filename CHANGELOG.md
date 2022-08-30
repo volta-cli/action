@@ -12,7 +12,7 @@
 
 
 ## v3.0.0 (2022-08-30)
-#
+
 #### :boom: Breaking Change
 * [#93](https://github.com/volta-cli/action/pull/93) Drop support for usage with Volta older than 1.0.0 ([@rwjblue](https://github.com/rwjblue))
 * [#75](https://github.com/volta-cli/action/pull/75) Output ESM into dist/ ([@rwjblue](https://github.com/rwjblue))
