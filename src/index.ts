@@ -8,8 +8,9 @@ async function run(): Promise<void> {
   try {
     const authToken = core.getInput('token', { required: false });
     const voltaVersion = core.getInput('volta-version', { required: false });
+    const openSSLVersion = core.getInput('openssl-version', { required: false });
 
-    await installer.getVolta(voltaVersion, authToken);
+    await installer.getVolta(voltaVersion, authToken, openSSLVersion);
 
     const hasPackageJSON = await findUp('package.json');
     const nodeVersion = core.getInput('node-version', { required: false });
