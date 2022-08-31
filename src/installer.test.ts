@@ -41,6 +41,12 @@ describe('buildDownloadUrl', () => {
     );
   });
 
+  test('linux with variant input', async function () {
+    expect(await buildDownloadUrl('linux', '0.6.4', { variant: 'rhel' })).toMatchInlineSnapshot(
+      `"https://github.com/volta-cli/volta/releases/download/v0.6.4/volta-0.6.4-linux-openssl-rhel.tar.gz"`
+    );
+  });
+
   test('win32', async function () {
     expect(await buildDownloadUrl('win32', '0.7.2')).toMatchInlineSnapshot(
       `"https://github.com/volta-cli/volta/releases/download/v0.7.2/volta-0.7.2-windows-x86_64.msi"`

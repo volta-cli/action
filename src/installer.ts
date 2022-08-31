@@ -61,7 +61,7 @@ export async function buildDownloadUrl(
       fileName = `volta-${version}-macos.tar.gz`;
       break;
     case 'linux': {
-      const openSSLVersion = await getOpenSSLVersion(mergedOptions.openSSLVersion);
+      const openSSLVersion = await getOpenSSLVersion(mergedOptions);
 
       fileName = `volta-${version}-linux-${openSSLVersion}.tar.gz`;
       break;
@@ -93,7 +93,16 @@ async function execOpenSSLVersion() {
   return output;
 }
 
-async function getOpenSSLVersion(version = ''): Promise<string> {
+async function getOpenSSLVersion(
+  options: Pick<VoltaInstallOptions, 'openSSLVersion' | 'variant'>
+): Promise<string> {
+  const variant = options.variant;
+
+  if (variant) {
+    return `openssl-${variant}`;
+  }
+
+  let version = options.openSSLVersion;
   const specificVersionViaInput = /^\d{1,3}\.\d{1,3}$/.test(version);
 
   if (specificVersionViaInput) {
