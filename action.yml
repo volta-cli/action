@@ -17,6 +17,9 @@ inputs:
   openssl-version:
     description: 'Version Spec of the openssl version to use.  Examples: 1.0, 1.1'
     default: ''
+  variant:
+    description: 'Specific variant we want to install. Example: providing the variant "rhel", which will target installing the volta-{version}-linux-openssl-rhel.tar.gz tarball'
+    default: ''
   registry-url:
     description: 'Optional registry to set up for auth. Will set the registry in a project level .npmrc file, and set up auth to read in from env.NODE_AUTH_TOKEN'
   scope:

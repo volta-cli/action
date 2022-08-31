@@ -10,6 +10,13 @@ import * as semver from 'semver';
 import * as fs from 'fs';
 import { v4 as uuidV4 } from 'uuid';
 
+type VoltaInstallOptions = {
+  versionSpec: string;
+  authToken: string;
+  openSSLVersion: string;
+  variant: string;
+}
+
 async function getLatestVolta(authToken: string): Promise<string> {
   const url = 'https://api.github.com/repos/volta-cli/volta/releases/latest';
 
@@ -155,21 +162,17 @@ export async function buildLayout(voltaHome: string): Promise<void> {
   await setupShims(voltaHome);
 }
 
-async function acquireVolta(
-  version: string,
-  authToken: string,
-  openSSLVersion: string
-): Promise<string> {
+async function acquireVolta(version: string, options: VoltaInstallOptions): Promise<string> {
   //
   // Download - a tool installer intimately knows how to get the tool (and construct urls)
   //
 
   core.info(`downloading volta@${version}`);
 
-  const downloadUrl = await buildDownloadUrl(os.platform(), version, openSSLVersion);
+  const downloadUrl = await buildDownloadUrl(os.platform(), version, options.openSSLVersion);
 
   core.debug(`downloading from \`${downloadUrl}\``);
-  const downloadPath = await tc.downloadTool(downloadUrl, undefined, authToken);
+  const downloadPath = await tc.downloadTool(downloadUrl, undefined, options.authToken);
 
   const voltaHome = path.join(
     // `RUNNER_TEMP` is used by @actions/tool-cache
@@ -280,18 +283,13 @@ export async function getVoltaVersion(versionSpec: string, authToken: string): P
   return version;
 }
 
-export async function getVolta(
-  versionSpec: string,
-  authToken: string,
-  openSSLVersion: string
-): Promise<void> {
-  const version = await getVoltaVersion(versionSpec, authToken);
-
+export async function getVolta(options: VoltaInstallOptions): Promise<void> {
+  const version = await getVoltaVersion(options.versionSpec, options.authToken);
   let voltaHome = tc.find('volta', version);
 
   if (voltaHome === '') {
     // download, extract, cache
-    const toolRoot = await acquireVolta(version, authToken, openSSLVersion);
+    const toolRoot = await acquireVolta(version, options);
 
     await setupVolta(version, toolRoot);
 
