@@ -93,9 +93,11 @@ Object {
 describe('getVoltaVersion', function () {
   it('without user provided volta version', async function () {
     try {
-      const scope = nock('https://volta.sh').get('/latest-version').reply(200, '999.999.999');
+      const scope = nock('https://api.github.com')
+        .get('/repos/volta-cli/volta/releases/latest')
+        .reply(200, '{ "name": "v999.999.999" }');
 
-      expect(await getVoltaVersion('')).toEqual('999.999.999');
+      expect(await getVoltaVersion('', 'some-token')).toEqual('999.999.999');
 
       scope.done();
     } finally {
@@ -104,11 +106,13 @@ describe('getVoltaVersion', function () {
   });
 
   it('with user provided volta version', async function () {
-    expect(await getVoltaVersion('1.0.1')).toEqual('1.0.1');
+    expect(await getVoltaVersion('1.0.1', 'some-token')).toEqual('1.0.1');
   });
 
   it('errors for older volta versions', async function () {
-    expect(async () => await getVoltaVersion('0.6.5')).rejects.toThrowErrorMatchingInlineSnapshot(
+    expect(
+      async () => await getVoltaVersion('0.6.5', 'some-token')
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
       `"volta-cli/action: Volta version must be >= 1.0.0 (you specified 0.6.5)"`
     );
   });
