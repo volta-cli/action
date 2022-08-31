@@ -11,24 +11,32 @@ describe('buildDownloadUrl', () => {
 
   test('linux', async function () {
     expect(
-      await buildDownloadUrl('linux', '0.6.4', 'OpenSSL 1.0.1e-fips 11 Feb 2013')
+      await buildDownloadUrl('linux', '0.6.4', {
+        openSSLVersion: 'OpenSSL 1.0.1e-fips 11 Feb 2013',
+      })
     ).toMatchInlineSnapshot(
       `"https://github.com/volta-cli/volta/releases/download/v0.6.4/volta-0.6.4-linux-openssl-1.0.tar.gz"`
     );
 
     expect(
-      await buildDownloadUrl('linux', '0.6.4', 'OpenSSL 1.1.1e-fips 11 Sep 2018')
+      await buildDownloadUrl('linux', '0.6.4', {
+        openSSLVersion: 'OpenSSL 1.1.1e-fips 11 Sep 2018',
+      })
     ).toMatchInlineSnapshot(
       `"https://github.com/volta-cli/volta/releases/download/v0.6.4/volta-0.6.4-linux-openssl-1.1.tar.gz"`
     );
   });
 
   test('linux with openssl-version input', async function () {
-    expect(await buildDownloadUrl('linux', '0.6.4', '1.0')).toMatchInlineSnapshot(
+    expect(
+      await buildDownloadUrl('linux', '0.6.4', { openSSLVersion: '1.0' })
+    ).toMatchInlineSnapshot(
       `"https://github.com/volta-cli/volta/releases/download/v0.6.4/volta-0.6.4-linux-openssl-1.0.tar.gz"`
     );
 
-    expect(await buildDownloadUrl('linux', '0.6.4', '1.1')).toMatchInlineSnapshot(
+    expect(
+      await buildDownloadUrl('linux', '0.6.4', { openSSLVersion: '1.1' })
+    ).toMatchInlineSnapshot(
       `"https://github.com/volta-cli/volta/releases/download/v0.6.4/volta-0.6.4-linux-openssl-1.1.tar.gz"`
     );
   });

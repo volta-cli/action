@@ -47,15 +47,21 @@ function voltaVersionHasSetup(version: string): boolean {
 export async function buildDownloadUrl(
   platform: string,
   version: string,
-  openSSLVersion = ''
+  options?: Partial<VoltaInstallOptions>
 ): Promise<string> {
+  const mergedOptions = {
+    openSSLVersion: '',
+    variant: '',
+    ...options,
+  };
   let fileName: string;
+
   switch (platform) {
     case 'darwin':
       fileName = `volta-${version}-macos.tar.gz`;
       break;
     case 'linux': {
-      openSSLVersion = await getOpenSSLVersion(openSSLVersion);
+      const openSSLVersion = await getOpenSSLVersion(mergedOptions.openSSLVersion);
 
       fileName = `volta-${version}-linux-${openSSLVersion}.tar.gz`;
       break;
@@ -169,7 +175,7 @@ async function acquireVolta(version: string, options: VoltaInstallOptions): Prom
 
   core.info(`downloading volta@${version}`);
 
-  const downloadUrl = await buildDownloadUrl(os.platform(), version, options.openSSLVersion);
+  const downloadUrl = await buildDownloadUrl(os.platform(), version, options);
 
   core.debug(`downloading from \`${downloadUrl}\``);
   const downloadPath = await tc.downloadTool(downloadUrl, undefined, options.authToken);
