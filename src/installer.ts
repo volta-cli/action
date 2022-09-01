@@ -1,20 +1,36 @@
 import * as core from '@actions/core';
+import * as hc from '@actions/http-client';
 import * as tc from '@actions/tool-cache';
 import * as io from '@actions/io';
 import { exec, ExecOptions } from '@actions/exec';
-import got from 'got';
+import type { OutgoingHttpHeaders } from 'http';
 import * as os from 'os';
 import * as path from 'path';
 import * as semver from 'semver';
 import * as fs from 'fs';
 import { v4 as uuidV4 } from 'uuid';
 
-async function getLatestVolta(): Promise<string> {
-  const url = 'https://volta.sh/latest-version';
+async function getLatestVolta(authToken: string): Promise<string> {
+  const url = 'https://api.github.com/repos/volta-cli/volta/releases/latest';
 
-  const response = await got(url);
+  const http = new hc.HttpClient('volta-cli/action', [], {
+    allowRetries: true,
+    maxRetries: 3,
+  });
 
-  return semver.clean(response.body) as string;
+  let headers: OutgoingHttpHeaders | undefined;
+  if (authToken) {
+    headers = {
+      authorization: authToken,
+    };
+  }
+
+  const response = await http.getJson<{ name: string }>(url, headers);
+  if (!response.result) {
+    throw new Error(`volta-cli/action: Could not download latest release from ${url}`);
+  }
+
+  return semver.clean(response.result.name) as string;
 }
 
 function voltaVersionHasSetup(version: string): boolean {
@@ -244,7 +260,7 @@ export async function pinYarn(version: string): Promise<void> {
   await execVolta(['pin', `yarn${version === 'true' ? '' : `@${version}`}`]);
 }
 
-export async function getVoltaVersion(versionSpec: string): Promise<string> {
+export async function getVoltaVersion(versionSpec: string, authToken: string): Promise<string> {
   let version = semver.clean(versionSpec) || '';
   const validVersionProvided = semver.valid(version) !== null;
 
@@ -258,7 +274,7 @@ export async function getVoltaVersion(versionSpec: string): Promise<string> {
     core.info(`using user provided version volta@${version}`);
   } else {
     core.info(`looking up latest volta version from https://volta.sh/latest-version`);
-    version = await getLatestVolta();
+    version = await getLatestVolta(authToken);
   }
 
   return version;
@@ -269,7 +285,7 @@ export async function getVolta(
   authToken: string,
   openSSLVersion: string
 ): Promise<void> {
-  const version = await getVoltaVersion(versionSpec);
+  const version = await getVoltaVersion(versionSpec, authToken);
 
   let voltaHome = tc.find('volta', version);
 
