@@ -273,7 +273,7 @@ export async function getVoltaVersion(versionSpec: string, authToken: string): P
   if (validVersionProvided) {
     core.info(`using user provided version volta@${version}`);
   } else {
-    core.info(`looking up latest volta version from https://volta.sh/latest-version`);
+    core.info(`looking up latest volta version`);
     version = await getLatestVolta(authToken);
   }
 
