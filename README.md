@@ -9,7 +9,26 @@ This action installs [volta](https://volta.sh) by:
 - downloading and caching volta (adding it to your $PATH)
 - optionally downloading and caching a version of node - npm by version spec and add to PATH
 
-# Usage
+<!-- action-docs-inputs -->
+## Inputs
+
+| parameter | description | required | default |
+| - | - | - | - |
+| volta-version | Version Spec of the volta version to use.  Examples: 0.6.x, 10.15.1, >=10.15.0 | `false` |  |
+| node-version | Version Spec of the node version to use.  Examples: 10.6.x, 10.15.1, >=10.15.0 | `false` |  |
+| npm-version | Version Spec of the npm version to use.  Examples: 7.5.x, 7.5.3, >=7.5.3 | `false` |  |
+| yarn-version | Version Spec of the yarn version to use.  Examples: 1.6.x, 10.15.1, >=10.15.0 | `false` |  |
+| openssl-version | Version Spec of the openssl version to use.  Examples: 1.0, 1.1 | `false` |  |
+| registry-url | Optional registry to set up for auth. Will set the registry in a project level .npmrc file, and set up auth to read in from env.NODE_AUTH_TOKEN | `false` |  |
+| scope | Optional scope for authenticating against scoped registries. Will fall back to the repository owner when using the GitHub Packages registry (https://npm.pkg.github.com/). | `false` |  |
+| token | Used to avoid low rate limiting for cached tool downloads.  Since there's a default, this is typically not supplied by the user. | `false` | ${{ github.token }} |
+| always-auth | Set always-auth in npmrc | `false` | false |
+
+
+
+<!-- action-docs-inputs -->
+
+## Usage
 
 See [action.yml](action.yml)
 
@@ -72,6 +91,6 @@ steps:
 - run: npm test
 ```
 
-# License
+## License
 
 The scripts and documentation in this project are released under the [MIT License](LICENSE)
