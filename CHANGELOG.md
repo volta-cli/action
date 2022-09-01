@@ -2,6 +2,20 @@
 
 
 
+
+## v3.0.2 (2022-09-01)
+
+#### :bug: Bug Fix
+* [#101](https://github.com/volta-cli/action/pull/101) Use GitHub API to retrieve latest release information. ([@rwjblue](https://github.com/rwjblue))
+
+#### :memo: Documentation
+* [#100](https://github.com/volta-cli/action/pull/100) Fix changelog heading ([@Turbo87](https://github.com/Turbo87))
+
+#### Committers: 2
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- Tobias Bieniek ([@Turbo87](https://github.com/Turbo87))
+
+
 ## v3.0.1 (2022-08-30)
 
 #### :memo: Documentation
