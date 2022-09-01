@@ -1,4 +1,4 @@
-import { buildLayout, buildDownloadUrl, getVoltaVersion } from './installer';
+import { buildLayout, buildDownloadUrl, getVoltaVersion, getOpenSSLVersion } from './installer';
 import { createTempDir } from 'broccoli-test-helper';
 import nock from 'nock';
 
@@ -11,38 +11,20 @@ describe('buildDownloadUrl', () => {
 
   test('linux', async function () {
     expect(
-      await buildDownloadUrl('linux', '0.6.4', {
-        openSSLVersion: 'OpenSSL 1.0.1e-fips 11 Feb 2013',
-      })
+      await buildDownloadUrl('linux', '0.6.4', '', 'OpenSSL 1.0.1e-fips 11 Feb 2013')
     ).toMatchInlineSnapshot(
       `"https://github.com/volta-cli/volta/releases/download/v0.6.4/volta-0.6.4-linux-openssl-1.0.tar.gz"`
     );
 
     expect(
-      await buildDownloadUrl('linux', '0.6.4', {
-        openSSLVersion: 'OpenSSL 1.1.1e-fips 11 Sep 2018',
-      })
-    ).toMatchInlineSnapshot(
-      `"https://github.com/volta-cli/volta/releases/download/v0.6.4/volta-0.6.4-linux-openssl-1.1.tar.gz"`
-    );
-  });
-
-  test('linux with openssl-version input', async function () {
-    expect(
-      await buildDownloadUrl('linux', '0.6.4', { openSSLVersion: '1.0' })
-    ).toMatchInlineSnapshot(
-      `"https://github.com/volta-cli/volta/releases/download/v0.6.4/volta-0.6.4-linux-openssl-1.0.tar.gz"`
-    );
-
-    expect(
-      await buildDownloadUrl('linux', '0.6.4', { openSSLVersion: '1.1' })
+      await buildDownloadUrl('linux', '0.6.4', '', 'OpenSSL 1.1.1e-fips 11 Sep 2018')
     ).toMatchInlineSnapshot(
       `"https://github.com/volta-cli/volta/releases/download/v0.6.4/volta-0.6.4-linux-openssl-1.1.tar.gz"`
     );
   });
 
   test('linux with variant input', async function () {
-    expect(await buildDownloadUrl('linux', '0.6.4', { variant: 'rhel' })).toMatchInlineSnapshot(
+    expect(await buildDownloadUrl('linux', '0.6.4', 'linux-openssl-rhel')).toMatchInlineSnapshot(
       `"https://github.com/volta-cli/volta/releases/download/v0.6.4/volta-0.6.4-linux-openssl-rhel.tar.gz"`
     );
   });
@@ -60,6 +42,20 @@ describe('buildDownloadUrl', () => {
   });
 });
 
+describe('getOpenSSLVersion', () => {
+  test('1.0', async function () {
+    expect(await getOpenSSLVersion('OpenSSL 1.0.1e-fips 11 Feb 2013')).toMatchInlineSnapshot(
+      `"openssl-1.0"`
+    );
+  });
+
+  test('1.1', async function () {
+    expect(await getOpenSSLVersion('OpenSSL 1.1.1e-fips 11 Sep 2018')).toMatchInlineSnapshot(
+      `"openssl-1.1"`
+    );
+  });
+});
+
 describe('buildLayout', () => {
   test('creates the rough folder structure', async () => {
     const tmpdir = await createTempDir();
@@ -73,34 +69,34 @@ describe('buildLayout', () => {
     await buildLayout(tmpdir.path());
 
     expect(tmpdir.read()).toMatchInlineSnapshot(`
-Object {
-  "bin": Object {
-    "node": "shim-file-here",
-    "npm": "shim-file-here",
-    "npx": "shim-file-here",
-    "shim": "shim-file-here",
-    "yarn": "shim-file-here",
-  },
-  "cache": Object {
-    "node": Object {},
-  },
-  "log": Object {},
-  "tmp": Object {},
-  "tools": Object {
-    "image": Object {
-      "node": Object {},
-      "packages": Object {},
-      "yarn": Object {},
-    },
-    "inventory": Object {
-      "node": Object {},
-      "packages": Object {},
-      "yarn": Object {},
-    },
-    "user": Object {},
-  },
-}
-`);
+      Object {
+        "bin": Object {
+          "node": "shim-file-here",
+          "npm": "shim-file-here",
+          "npx": "shim-file-here",
+          "shim": "shim-file-here",
+          "yarn": "shim-file-here",
+        },
+        "cache": Object {
+          "node": Object {},
+        },
+        "log": Object {},
+        "tmp": Object {},
+        "tools": Object {
+          "image": Object {
+            "node": Object {},
+            "packages": Object {},
+            "yarn": Object {},
+          },
+          "inventory": Object {
+            "node": Object {},
+            "packages": Object {},
+            "yarn": Object {},
+          },
+          "user": Object {},
+        },
+      }
+    `);
   });
 });
 
