@@ -15,7 +15,7 @@ type VoltaInstallOptions = {
   authToken: string;
   openSSLVersion: string;
   variant: string;
-}
+};
 
 async function getLatestVolta(authToken: string): Promise<string> {
   const url = 'https://api.github.com/repos/volta-cli/volta/releases/latest';
@@ -300,6 +300,7 @@ export async function getVoltaVersion(versionSpec: string, authToken: string): P
 
 export async function getVolta(options: VoltaInstallOptions): Promise<void> {
   const version = await getVoltaVersion(options.versionSpec, options.authToken);
+
   let voltaHome = tc.find('volta', version);
 
   if (voltaHome === '') {
