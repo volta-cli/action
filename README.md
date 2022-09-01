@@ -91,6 +91,21 @@ steps:
 - run: npm test
 ```
 
+In some cases, you may know the particular variant of the installer that you want to use for Volta. You can specify the `variant` input to the action to use a specific installer:
+
+```yaml
+steps:
+- uses: actions/checkout@v3
+- uses: volta-cli/action@v3
+  with:
+    variant: 'linux-openssl-rhel'
+
+- run: yarn install
+- run: yarn test
+```
+
+The `variant` fragment corresponds to a portion of the installer filename, and can be found in the [Volta Releases](https://github.com/volta-cli/action/releases) page.
+
 ## License
 
 The scripts and documentation in this project are released under the [MIT License](LICENSE)
