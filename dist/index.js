@@ -22674,24 +22674,43 @@ async function getLatestVolta(authToken) {
 function voltaVersionHasSetup(version) {
     return semver.gte(version, '0.7.0');
 }
-async function buildDownloadUrl(platform, version, openSSLVersion = '') {
-    let fileName;
-    switch (platform) {
-        case 'darwin':
-            fileName = `volta-${version}-macos.tar.gz`;
-            break;
-        case 'linux': {
-            openSSLVersion = await getOpenSSLVersion(openSSLVersion);
-            fileName = `volta-${version}-linux-${openSSLVersion}.tar.gz`;
-            break;
+async function buildDownloadUrl(platform, version, variant = '', openSSLVersionForTesting = '') {
+    let fileName = '';
+    if (variant) {
+        fileName = `volta-${version}-${variant}.tar.gz`;
+    }
+    if (!fileName) {
+        switch (platform) {
+            case 'darwin':
+                fileName = `volta-${version}-macos.tar.gz`;
+                break;
+            case 'linux': {
+                const openSSLVersion = await getOpenSSLVersion(openSSLVersionForTesting);
+                fileName = `volta-${version}-linux-${openSSLVersion}.tar.gz`;
+                break;
+            }
+            case 'win32':
+                fileName = `volta-${version}-windows-x86_64.msi`;
+                break;
+            default:
+                throw new Error(`your platform ${platform} is not yet supported`);
         }
-        case 'win32':
-            fileName = `volta-${version}-windows-x86_64.msi`;
-            break;
-        default:
-            throw new Error(`your platform ${platform} is not yet supported`);
     }
     return `https://github.com/volta-cli/volta/releases/download/v${version}/${fileName}`;
+}
+async function getOpenSSLVersion(version = '') {
+    if (version === '') {
+        version = await execOpenSSLVersion();
+    }
+    // typical version string looks like 'OpenSSL 1.0.1e-fips 11 Feb 2013'
+    const openSSLVersionPattern = /^([^\s]*)\s([0-9]+\.[0-9]+)/;
+    const match = openSSLVersionPattern.exec(version);
+    if (match === null) {
+        throw new Error(`No version of OpenSSL was found. @volta-cli/action requires a valid version of OpenSSL. ('openssl version' output: ${version})`);
+    }
+    version = match[2];
+    // should return in openssl-1.1 format
+    return `openssl-${version}`;
 }
 async function execOpenSSLVersion() {
     let output = '';
@@ -22706,24 +22725,6 @@ async function execOpenSSLVersion() {
     };
     await (0,exec.exec)('openssl version', [], options);
     return output;
-}
-async function getOpenSSLVersion(version = '') {
-    const specificVersionViaInput = /^\d{1,3}\.\d{1,3}$/.test(version);
-    if (specificVersionViaInput) {
-        return `openssl-${version}`;
-    }
-    if (version === '') {
-        version = await execOpenSSLVersion();
-    }
-    // typical version string looks like 'OpenSSL 1.0.1e-fips 11 Feb 2013'
-    const openSSLVersionPattern = /^([^\s]*)\s([0-9]+\.[0-9]+)/;
-    const match = openSSLVersionPattern.exec(version);
-    if (match === null) {
-        throw new Error(`No version of OpenSSL was found. @volta-cli/action requires a valid version of OpenSSL. ('openssl version' output: ${version})`);
-    }
-    version = match[2];
-    // should return in openssl-1.1 format
-    return `openssl-${version}`;
 }
 /*
  * Used to setup a specific shim when running volta < 0.7
@@ -22768,14 +22769,14 @@ async function buildLayout(voltaHome) {
     await io.mkdirP(external_path_.join(voltaHome, 'tools/user'));
     await setupShims(voltaHome);
 }
-async function acquireVolta(version, authToken, openSSLVersion) {
+async function acquireVolta(version, options) {
     //
     // Download - a tool installer intimately knows how to get the tool (and construct urls)
     //
     core.info(`downloading volta@${version}`);
-    const downloadUrl = await buildDownloadUrl(external_os_.platform(), version, openSSLVersion);
+    const downloadUrl = await buildDownloadUrl(external_os_.platform(), version, options.variant);
     core.debug(`downloading from \`${downloadUrl}\``);
-    const downloadPath = await tool_cache.downloadTool(downloadUrl, undefined, authToken);
+    const downloadPath = await tool_cache.downloadTool(downloadUrl, undefined, options.authToken);
     const voltaHome = external_path_.join(
     // `RUNNER_TEMP` is used by @actions/tool-cache
     process.env['RUNNER_TEMP'] || '', v4());
@@ -22859,12 +22860,12 @@ async function getVoltaVersion(versionSpec, authToken) {
     }
     return version;
 }
-async function getVolta(versionSpec, authToken, openSSLVersion) {
-    const version = await getVoltaVersion(versionSpec, authToken);
+async function getVolta(options) {
+    const version = await getVoltaVersion(options.versionSpec, options.authToken);
     let voltaHome = tool_cache.find('volta', version);
     if (voltaHome === '') {
         // download, extract, cache
-        const toolRoot = await acquireVolta(version, authToken, openSSLVersion);
+        const toolRoot = await acquireVolta(version, options);
         await setupVolta(version, toolRoot);
         // Install into the local tool cache - node extracts with a root folder
         // that matches the fileName downloaded
@@ -22959,8 +22960,8 @@ async function run() {
     try {
         const authToken = core.getInput('token', { required: false });
         const voltaVersion = core.getInput('volta-version', { required: false });
-        const openSSLVersion = core.getInput('openssl-version', { required: false });
-        await getVolta(voltaVersion, authToken, openSSLVersion);
+        const variant = core.getInput('variant', { required: false });
+        await getVolta({ versionSpec: voltaVersion, authToken, variant });
         const hasPackageJSON = await find_up_default()('package.json');
         const nodeVersion = core.getInput('node-version', { required: false });
         if (nodeVersion !== '') {
