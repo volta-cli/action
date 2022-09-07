@@ -53,9 +53,7 @@ export async function buildDownloadUrl(
 
   if (variant) {
     fileName = `volta-${version}-${variant}.tar.gz`;
-  }
-
-  if (!fileName) {
+  } else {
     switch (platform) {
       case 'darwin':
         fileName = `volta-${version}-macos.tar.gz`;
