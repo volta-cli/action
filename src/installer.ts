@@ -220,18 +220,22 @@ async function setupVolta(version: string, voltaHome: string): Promise<void> {
   }
 }
 
-export async function execVolta(specifiedArgs: string[]): Promise<void> {
+export async function execVolta(workingDirectory: string, specifiedArgs: string[]): Promise<void> {
   const args = [...specifiedArgs];
-  let options;
+  const options: ExecOptions = {
+    cwd: workingDirectory,
+  };
 
   if (core.isDebug()) {
     args.unshift('--verbose');
 
-    options = {
-      env: {
-        VOLTA_LOGLEVEL: 'debug',
-        RUST_STACKTRACE: 'full',
-      },
+    options.env = {
+      VOLTA_LOGLEVEL: 'debug',
+      RUST_STACKTRACE: 'full',
+
+      // add `process.env` (otherwise specifying `env` will cause us to no
+      // longer inherit `process.env`)
+      ...process.env,
     };
   }
 
@@ -239,27 +243,30 @@ export async function execVolta(specifiedArgs: string[]): Promise<void> {
 }
 
 export async function installNode(version: string): Promise<void> {
-  await execVolta(['install', `node${version === 'true' ? '' : `@${version}`}`]);
+  // using `.` here because `volta install` doesn't care about the working directory at all
+  await execVolta('.', ['install', `node${version === 'true' ? '' : `@${version}`}`]);
 }
 
 export async function installNpm(version: string): Promise<void> {
-  await execVolta(['install', `npm${version === 'true' ? '' : `@${version}`}`]);
+  // using `.` here because `volta install` doesn't care about the working directory at all
+  await execVolta('.', ['install', `npm${version === 'true' ? '' : `@${version}`}`]);
 }
 
 export async function installYarn(version: string): Promise<void> {
-  await execVolta(['install', `yarn${version === 'true' ? '' : `@${version}`}`]);
+  // using `.` here because `volta install` doesn't care about the working directory at all
+  await execVolta('.', ['install', `yarn${version === 'true' ? '' : `@${version}`}`]);
 }
 
-export async function pinNode(version: string): Promise<void> {
-  await execVolta(['pin', `node${version === 'true' ? '' : `@${version}`}`]);
+export async function pinNode(workingDirectory: string, version: string): Promise<void> {
+  await execVolta(workingDirectory, ['pin', `node${version === 'true' ? '' : `@${version}`}`]);
 }
 
-export async function pinNpm(version: string): Promise<void> {
-  await execVolta(['pin', `npm${version === 'true' ? '' : `@${version}`}`]);
+export async function pinNpm(workingDirectory: string, version: string): Promise<void> {
+  await execVolta(workingDirectory, ['pin', `npm${version === 'true' ? '' : `@${version}`}`]);
 }
 
-export async function pinYarn(version: string): Promise<void> {
-  await execVolta(['pin', `yarn${version === 'true' ? '' : `@${version}`}`]);
+export async function pinYarn(workingDirectory: string, version: string): Promise<void> {
+  await execVolta(workingDirectory, ['pin', `yarn${version === 'true' ? '' : `@${version}`}`]);
 }
 
 export async function getVoltaVersion(versionSpec: string, authToken: string): Promise<string> {
