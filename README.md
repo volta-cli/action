@@ -18,7 +18,7 @@ This action installs [volta](https://volta.sh) by:
 | node-version | Version Spec of the node version to use.  Examples: 10.6.x, 10.15.1, >=10.15.0 | `false` |  |
 | npm-version | Version Spec of the npm version to use.  Examples: 7.5.x, 7.5.3, >=7.5.3 | `false` |  |
 | yarn-version | Version Spec of the yarn version to use.  Examples: 1.6.x, 10.15.1, >=10.15.0 | `false` |  |
-| openssl-version | Version Spec of the openssl version to use.  Examples: 1.0, 1.1 | `false` |  |
+| variant | Specific variant to install. Example: providing the variant "linux-openssl-rhel", which will target installing the volta-${version}-linux-openssl-rhel.tar.gz tarball | `false` |  |
 | registry-url | Optional registry to set up for auth. Will set the registry in a project level .npmrc file, and set up auth to read in from env.NODE_AUTH_TOKEN | `false` |  |
 | scope | Optional scope for authenticating against scoped registries. Will fall back to the repository owner when using the GitHub Packages registry (https://npm.pkg.github.com/). | `false` |  |
 | token | Used to avoid low rate limiting for cached tool downloads.  Since there's a default, this is typically not supplied by the user. | `false` | ${{ github.token }} |
@@ -90,6 +90,21 @@ steps:
 - run: npm install
 - run: npm test
 ```
+
+In some cases, you may know the particular variant of the installer that you want to use for Volta. You can specify the `variant` input to the action to use a specific installer:
+
+```yaml
+steps:
+- uses: actions/checkout@v3
+- uses: volta-cli/action@v3
+  with:
+    variant: 'linux-openssl-rhel'
+
+- run: yarn install
+- run: yarn test
+```
+
+The `variant` fragment corresponds to a portion of the installer filename, and can be found in the [Volta Releases](https://github.com/volta-cli/action/releases) page.
 
 ## License
 

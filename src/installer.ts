@@ -10,6 +10,12 @@ import * as semver from 'semver';
 import * as fs from 'fs';
 import { v4 as uuidV4 } from 'uuid';
 
+type VoltaInstallOptions = {
+  versionSpec: string;
+  authToken: string;
+  variant: string;
+};
+
 async function getLatestVolta(authToken: string): Promise<string> {
   const url = 'https://api.github.com/repos/volta-cli/volta/releases/latest';
 
@@ -40,53 +46,36 @@ function voltaVersionHasSetup(version: string): boolean {
 export async function buildDownloadUrl(
   platform: string,
   version: string,
-  openSSLVersion = ''
+  variant = '',
+  openSSLVersionForTesting = ''
 ): Promise<string> {
-  let fileName: string;
-  switch (platform) {
-    case 'darwin':
-      fileName = `volta-${version}-macos.tar.gz`;
-      break;
-    case 'linux': {
-      openSSLVersion = await getOpenSSLVersion(openSSLVersion);
+  let fileName = '';
 
-      fileName = `volta-${version}-linux-${openSSLVersion}.tar.gz`;
-      break;
+  if (variant) {
+    fileName = `volta-${version}-${variant}.tar.gz`;
+  } else {
+    switch (platform) {
+      case 'darwin':
+        fileName = `volta-${version}-macos.tar.gz`;
+        break;
+      case 'linux': {
+        const openSSLVersion = await getOpenSSLVersion(openSSLVersionForTesting);
+
+        fileName = `volta-${version}-linux-${openSSLVersion}.tar.gz`;
+        break;
+      }
+      case 'win32':
+        fileName = `volta-${version}-windows-x86_64.msi`;
+        break;
+      default:
+        throw new Error(`your platform ${platform} is not yet supported`);
     }
-    case 'win32':
-      fileName = `volta-${version}-windows-x86_64.msi`;
-      break;
-    default:
-      throw new Error(`your platform ${platform} is not yet supported`);
   }
 
   return `https://github.com/volta-cli/volta/releases/download/v${version}/${fileName}`;
 }
 
-async function execOpenSSLVersion() {
-  let output = '';
-  const options: ExecOptions = {};
-  options.listeners = {
-    stdout: (data: Buffer) => {
-      output += data.toString();
-    },
-    stderr: (data: Buffer) => {
-      output += data.toString();
-    },
-  };
-
-  await exec('openssl version', [], options);
-
-  return output;
-}
-
-async function getOpenSSLVersion(version = ''): Promise<string> {
-  const specificVersionViaInput = /^\d{1,3}\.\d{1,3}$/.test(version);
-
-  if (specificVersionViaInput) {
-    return `openssl-${version}`;
-  }
-
+export async function getOpenSSLVersion(version = ''): Promise<string> {
   if (version === '') {
     version = await execOpenSSLVersion();
   }
@@ -105,6 +94,23 @@ async function getOpenSSLVersion(version = ''): Promise<string> {
 
   // should return in openssl-1.1 format
   return `openssl-${version}`;
+}
+
+async function execOpenSSLVersion() {
+  let output = '';
+  const options: ExecOptions = {};
+  options.listeners = {
+    stdout: (data: Buffer) => {
+      output += data.toString();
+    },
+    stderr: (data: Buffer) => {
+      output += data.toString();
+    },
+  };
+
+  await exec('openssl version', [], options);
+
+  return output;
 }
 
 /*
@@ -155,21 +161,17 @@ export async function buildLayout(voltaHome: string): Promise<void> {
   await setupShims(voltaHome);
 }
 
-async function acquireVolta(
-  version: string,
-  authToken: string,
-  openSSLVersion: string
-): Promise<string> {
+async function acquireVolta(version: string, options: VoltaInstallOptions): Promise<string> {
   //
   // Download - a tool installer intimately knows how to get the tool (and construct urls)
   //
 
   core.info(`downloading volta@${version}`);
 
-  const downloadUrl = await buildDownloadUrl(os.platform(), version, openSSLVersion);
+  const downloadUrl = await buildDownloadUrl(os.platform(), version, options.variant);
 
   core.debug(`downloading from \`${downloadUrl}\``);
-  const downloadPath = await tc.downloadTool(downloadUrl, undefined, authToken);
+  const downloadPath = await tc.downloadTool(downloadUrl, undefined, options.authToken);
 
   const voltaHome = path.join(
     // `RUNNER_TEMP` is used by @actions/tool-cache
@@ -280,18 +282,14 @@ export async function getVoltaVersion(versionSpec: string, authToken: string): P
   return version;
 }
 
-export async function getVolta(
-  versionSpec: string,
-  authToken: string,
-  openSSLVersion: string
-): Promise<void> {
-  const version = await getVoltaVersion(versionSpec, authToken);
+export async function getVolta(options: VoltaInstallOptions): Promise<void> {
+  const version = await getVoltaVersion(options.versionSpec, options.authToken);
 
   let voltaHome = tc.find('volta', version);
 
   if (voltaHome === '') {
     // download, extract, cache
-    const toolRoot = await acquireVolta(version, authToken, openSSLVersion);
+    const toolRoot = await acquireVolta(version, options);
 
     await setupVolta(version, toolRoot);
 
