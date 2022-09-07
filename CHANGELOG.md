@@ -3,6 +3,24 @@
 
 
 
+
+## v4.0.0-beta.1 (2022-09-07)
+
+#### :boom: Breaking Change
+* [#102](https://github.com/volta-cli/action/pull/102) Replace `openssl-version` configuration with `variant` ([@scalvert](https://github.com/scalvert))
+
+#### :memo: Documentation
+* [#104](https://github.com/volta-cli/action/pull/104) Add action-docs updater ([@rwjblue](https://github.com/rwjblue))
+* [#103](https://github.com/volta-cli/action/pull/103) Remove reference to https://volta.sh/latest-version in logging ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#105](https://github.com/volta-cli/action/pull/105) Add CI scenario acceptance test using `variant` ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 2
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- Steve Calvert ([@scalvert](https://github.com/scalvert))
+
+
 ## v3.0.2 (2022-09-01)
 
 #### :bug: Bug Fix
