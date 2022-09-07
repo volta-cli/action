@@ -36,15 +36,15 @@
     "@actions/io": "^1.1.2",
     "@actions/tool-cache": "^2.0.1",
     "@types/jest": "^28.1.6",
-    "@types/node": "^18.7.2",
+    "@types/node": "^18.7.15",
     "@types/semver": "^7.3.12",
     "@types/uuid": "^8.3.4",
-    "@typescript-eslint/eslint-plugin": "^5.33.0",
-    "@typescript-eslint/parser": "^5.33.0",
+    "@typescript-eslint/eslint-plugin": "^5.36.2",
+    "@typescript-eslint/parser": "^5.36.2",
     "@vercel/ncc": "^0.34.0",
     "action-docs": "^1.0.4",
     "broccoli-test-helper": "^2.0.0",
-    "eslint": "^8.21.0",
+    "eslint": "^8.23.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "find-up": "^5.0.0",
@@ -57,9 +57,9 @@
     "release-it-lerna-changelog": "^3.1.0",
     "rimraf": "^3.0.2",
     "semver": "^7.3.7",
-    "ts-jest": "^28.0.7",
-    "typescript": "^4.7.4",
-    "uuid": "^8.3.2"
+    "ts-jest": "^28.0.8",
+    "typescript": "^4.8.2",
+    "uuid": "^9.0.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
