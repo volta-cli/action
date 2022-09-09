@@ -3,7 +3,7 @@ description: 'Setup a Node.js environment with Volta'
 author: 'Robert Jackson <me@rwjblue.com>'
 inputs:
   volta-version:
-    description: 'Version Spec of the volta version to use.  Examples: 0.6.x, 10.15.1, >=10.15.0'
+    description: 'Version of `volta` to fetch and setup. Examples: 0.6.0, 10.15.1, >=10.15.0'
     default: ''
   node-version:
     description: 'Version Spec of the node version to use.  Examples: 10.6.x, 10.15.1, >=10.15.0'
@@ -13,6 +13,9 @@ inputs:
     default: ''
   yarn-version:
     description: 'Version Spec of the yarn version to use.  Examples: 1.6.x, 10.15.1, >=10.15.0'
+    default: ''
+  package-json-path:
+    description: 'The path to the package.json to update when using an explicit `node-version` | `yarn-version` | `npm-version` override. By default, we will use `package.json` in the checkout root.'
     default: ''
   variant:
     description: 'Specific variant to install. Example: providing the variant "linux-openssl-rhel", which will target installing the volta-${version}-linux-openssl-rhel.tar.gz tarball'
