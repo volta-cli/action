@@ -13493,102 +13493,6 @@ module.exports = function(stream_module) {
 
 /***/ }),
 
-/***/ 9486:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-
-const path = __nccwpck_require__(1017);
-const locatePath = __nccwpck_require__(3447);
-const pathExists = __nccwpck_require__(6978);
-
-const stop = Symbol('findUp.stop');
-
-module.exports = async (name, options = {}) => {
-	let directory = path.resolve(options.cwd || '');
-	const {root} = path.parse(directory);
-	const paths = [].concat(name);
-
-	const runMatcher = async locateOptions => {
-		if (typeof name !== 'function') {
-			return locatePath(paths, locateOptions);
-		}
-
-		const foundPath = await name(locateOptions.cwd);
-		if (typeof foundPath === 'string') {
-			return locatePath([foundPath], locateOptions);
-		}
-
-		return foundPath;
-	};
-
-	// eslint-disable-next-line no-constant-condition
-	while (true) {
-		// eslint-disable-next-line no-await-in-loop
-		const foundPath = await runMatcher({...options, cwd: directory});
-
-		if (foundPath === stop) {
-			return;
-		}
-
-		if (foundPath) {
-			return path.resolve(directory, foundPath);
-		}
-
-		if (directory === root) {
-			return;
-		}
-
-		directory = path.dirname(directory);
-	}
-};
-
-module.exports.sync = (name, options = {}) => {
-	let directory = path.resolve(options.cwd || '');
-	const {root} = path.parse(directory);
-	const paths = [].concat(name);
-
-	const runMatcher = locateOptions => {
-		if (typeof name !== 'function') {
-			return locatePath.sync(paths, locateOptions);
-		}
-
-		const foundPath = name(locateOptions.cwd);
-		if (typeof foundPath === 'string') {
-			return locatePath.sync([foundPath], locateOptions);
-		}
-
-		return foundPath;
-	};
-
-	// eslint-disable-next-line no-constant-condition
-	while (true) {
-		const foundPath = runMatcher({...options, cwd: directory});
-
-		if (foundPath === stop) {
-			return;
-		}
-
-		if (foundPath) {
-			return path.resolve(directory, foundPath);
-		}
-
-		if (directory === root) {
-			return;
-		}
-
-		directory = path.dirname(directory);
-	}
-};
-
-module.exports.exists = pathExists;
-
-module.exports.sync.exists = pathExists.sync;
-
-module.exports.stop = stop;
-
-
-/***/ }),
-
 /***/ 3287:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -13630,81 +13534,6 @@ function isPlainObject(o) {
 }
 
 exports.isPlainObject = isPlainObject;
-
-
-/***/ }),
-
-/***/ 3447:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-
-const path = __nccwpck_require__(1017);
-const fs = __nccwpck_require__(7147);
-const {promisify} = __nccwpck_require__(3837);
-const pLocate = __nccwpck_require__(104);
-
-const fsStat = promisify(fs.stat);
-const fsLStat = promisify(fs.lstat);
-
-const typeMappings = {
-	directory: 'isDirectory',
-	file: 'isFile'
-};
-
-function checkType({type}) {
-	if (type in typeMappings) {
-		return;
-	}
-
-	throw new Error(`Invalid type specified: ${type}`);
-}
-
-const matchType = (type, stat) => type === undefined || stat[typeMappings[type]]();
-
-module.exports = async (paths, options) => {
-	options = {
-		cwd: process.cwd(),
-		type: 'file',
-		allowSymlinks: true,
-		...options
-	};
-
-	checkType(options);
-
-	const statFn = options.allowSymlinks ? fsStat : fsLStat;
-
-	return pLocate(paths, async path_ => {
-		try {
-			const stat = await statFn(path.resolve(options.cwd, path_));
-			return matchType(options.type, stat);
-		} catch {
-			return false;
-		}
-	}, options);
-};
-
-module.exports.sync = (paths, options) => {
-	options = {
-		cwd: process.cwd(),
-		allowSymlinks: true,
-		type: 'file',
-		...options
-	};
-
-	checkType(options);
-
-	const statFn = options.allowSymlinks ? fs.statSync : fs.lstatSync;
-
-	for (const path_ of paths) {
-		try {
-			const stat = statFn(path.resolve(options.cwd, path_));
-
-			if (matchType(options.type, stat)) {
-				return path_;
-			}
-		} catch {}
-	}
-};
 
 
 /***/ }),
@@ -16412,171 +16241,6 @@ function onceStrict (fn) {
   f.called = false
   return f
 }
-
-
-/***/ }),
-
-/***/ 7684:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-
-const Queue = __nccwpck_require__(5185);
-
-const pLimit = concurrency => {
-	if (!((Number.isInteger(concurrency) || concurrency === Infinity) && concurrency > 0)) {
-		throw new TypeError('Expected `concurrency` to be a number from 1 and up');
-	}
-
-	const queue = new Queue();
-	let activeCount = 0;
-
-	const next = () => {
-		activeCount--;
-
-		if (queue.size > 0) {
-			queue.dequeue()();
-		}
-	};
-
-	const run = async (fn, resolve, ...args) => {
-		activeCount++;
-
-		const result = (async () => fn(...args))();
-
-		resolve(result);
-
-		try {
-			await result;
-		} catch {}
-
-		next();
-	};
-
-	const enqueue = (fn, resolve, ...args) => {
-		queue.enqueue(run.bind(null, fn, resolve, ...args));
-
-		(async () => {
-			// This function needs to wait until the next microtask before comparing
-			// `activeCount` to `concurrency`, because `activeCount` is updated asynchronously
-			// when the run function is dequeued and called. The comparison in the if-statement
-			// needs to happen asynchronously as well to get an up-to-date value for `activeCount`.
-			await Promise.resolve();
-
-			if (activeCount < concurrency && queue.size > 0) {
-				queue.dequeue()();
-			}
-		})();
-	};
-
-	const generator = (fn, ...args) => new Promise(resolve => {
-		enqueue(fn, resolve, ...args);
-	});
-
-	Object.defineProperties(generator, {
-		activeCount: {
-			get: () => activeCount
-		},
-		pendingCount: {
-			get: () => queue.size
-		},
-		clearQueue: {
-			value: () => {
-				queue.clear();
-			}
-		}
-	});
-
-	return generator;
-};
-
-module.exports = pLimit;
-
-
-/***/ }),
-
-/***/ 104:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-
-const pLimit = __nccwpck_require__(7684);
-
-class EndError extends Error {
-	constructor(value) {
-		super();
-		this.value = value;
-	}
-}
-
-// The input can also be a promise, so we await it
-const testElement = async (element, tester) => tester(await element);
-
-// The input can also be a promise, so we `Promise.all()` them both
-const finder = async element => {
-	const values = await Promise.all(element);
-	if (values[1] === true) {
-		throw new EndError(values[0]);
-	}
-
-	return false;
-};
-
-const pLocate = async (iterable, tester, options) => {
-	options = {
-		concurrency: Infinity,
-		preserveOrder: true,
-		...options
-	};
-
-	const limit = pLimit(options.concurrency);
-
-	// Start all the promises concurrently with optional limit
-	const items = [...iterable].map(element => [element, limit(testElement, element, tester)]);
-
-	// Check the promises either serially or concurrently
-	const checkLimit = pLimit(options.preserveOrder ? 1 : Infinity);
-
-	try {
-		await Promise.all(items.map(element => checkLimit(finder, element)));
-	} catch (error) {
-		if (error instanceof EndError) {
-			return error.value;
-		}
-
-		throw error;
-	}
-};
-
-module.exports = pLocate;
-
-
-/***/ }),
-
-/***/ 6978:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-
-const fs = __nccwpck_require__(7147);
-const {promisify} = __nccwpck_require__(3837);
-
-const pAccess = promisify(fs.access);
-
-module.exports = async path => {
-	try {
-		await pAccess(path);
-		return true;
-	} catch (_) {
-		return false;
-	}
-};
-
-module.exports.sync = path => {
-	try {
-		fs.accessSync(path);
-		return true;
-	} catch (_) {
-		return false;
-	}
-};
 
 
 /***/ }),
@@ -22931,81 +22595,6 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 5185:
-/***/ ((module) => {
-
-class Node {
-	/// value;
-	/// next;
-
-	constructor(value) {
-		this.value = value;
-
-		// TODO: Remove this when targeting Node.js 12.
-		this.next = undefined;
-	}
-}
-
-class Queue {
-	// TODO: Use private class fields when targeting Node.js 12.
-	// #_head;
-	// #_tail;
-	// #_size;
-
-	constructor() {
-		this.clear();
-	}
-
-	enqueue(value) {
-		const node = new Node(value);
-
-		if (this._head) {
-			this._tail.next = node;
-			this._tail = node;
-		} else {
-			this._head = node;
-			this._tail = node;
-		}
-
-		this._size++;
-	}
-
-	dequeue() {
-		const current = this._head;
-		if (!current) {
-			return;
-		}
-
-		this._head = this._head.next;
-		this._size--;
-		return current.value;
-	}
-
-	clear() {
-		this._head = undefined;
-		this._tail = undefined;
-		this._size = 0;
-	}
-
-	get size() {
-		return this._size;
-	}
-
-	* [Symbol.iterator]() {
-		let current = this._head;
-
-		while (current) {
-			yield current.value;
-			current = current.next;
-		}
-	}
-}
-
-module.exports = Queue;
-
-
-/***/ }),
-
 /***/ 9491:
 /***/ ((module) => {
 
@@ -23235,35 +22824,6 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ }
 /******/ 
 /************************************************************************/
-/******/ /* webpack/runtime/compat get default export */
-/******/ (() => {
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__nccwpck_require__.n = (module) => {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			() => (module['default']) :
-/******/ 			() => (module);
-/******/ 		__nccwpck_require__.d(getter, { a: getter });
-/******/ 		return getter;
-/******/ 	};
-/******/ })();
-/******/ 
-/******/ /* webpack/runtime/define property getters */
-/******/ (() => {
-/******/ 	// define getter functions for harmony exports
-/******/ 	__nccwpck_require__.d = (exports, definition) => {
-/******/ 		for(var key in definition) {
-/******/ 			if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
-/******/ 				Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 			}
-/******/ 		}
-/******/ 	};
-/******/ })();
-/******/ 
-/******/ /* webpack/runtime/hasOwnProperty shorthand */
-/******/ (() => {
-/******/ 	__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ })();
-/******/ 
 /******/ /* webpack/runtime/compat */
 /******/ 
 /******/ if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = new URL('.', import.meta.url).pathname.slice(import.meta.url.match(/^file:\/\/\/\w:/) ? 1 : 0, -1) + "/";
@@ -23275,9 +22835,10 @@ var __webpack_exports__ = {};
 
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(2186);
-// EXTERNAL MODULE: ./node_modules/find-up/index.js
-var find_up = __nccwpck_require__(9486);
-var find_up_default = /*#__PURE__*/__nccwpck_require__.n(find_up);
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(7147);
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(1017);
 // EXTERNAL MODULE: ./node_modules/@actions/http-client/lib/index.js
 var lib = __nccwpck_require__(6255);
 // EXTERNAL MODULE: ./node_modules/@actions/tool-cache/lib/tool-cache.js
@@ -23288,12 +22849,8 @@ var io = __nccwpck_require__(7436);
 var exec = __nccwpck_require__(1514);
 // EXTERNAL MODULE: external "os"
 var external_os_ = __nccwpck_require__(2037);
-// EXTERNAL MODULE: external "path"
-var external_path_ = __nccwpck_require__(1017);
 // EXTERNAL MODULE: ./node_modules/semver/index.js
 var semver = __nccwpck_require__(1383);
-// EXTERNAL MODULE: external "fs"
-var external_fs_ = __nccwpck_require__(7147);
 // EXTERNAL MODULE: ./node_modules/uuid/dist/index.js
 var dist = __nccwpck_require__(5840);
 ;// CONCATENATED MODULE: ./node_modules/uuid/wrapper.mjs
@@ -23479,37 +23036,43 @@ async function setupVolta(version, voltaHome) {
         await buildLayout(voltaHome);
     }
 }
-async function execVolta(specifiedArgs) {
+async function execVolta(workingDirectory, specifiedArgs) {
     const args = [...specifiedArgs];
-    let options;
+    const options = {
+        cwd: workingDirectory,
+    };
     if (core.isDebug()) {
         args.unshift('--verbose');
-        options = {
-            env: {
-                VOLTA_LOGLEVEL: 'debug',
-                RUST_STACKTRACE: 'full',
-            },
+        options.env = {
+            VOLTA_LOGLEVEL: 'debug',
+            RUST_STACKTRACE: 'full',
+            // add `process.env` (otherwise specifying `env` will cause us to no
+            // longer inherit `process.env`)
+            ...process.env,
         };
     }
     await (0,exec.exec)('volta', args, options);
 }
 async function installNode(version) {
-    await execVolta(['install', `node${version === 'true' ? '' : `@${version}`}`]);
+    // using `.` here because `volta install` doesn't care about the working directory at all
+    await execVolta('.', ['install', `node${version === 'true' ? '' : `@${version}`}`]);
 }
 async function installNpm(version) {
-    await execVolta(['install', `npm${version === 'true' ? '' : `@${version}`}`]);
+    // using `.` here because `volta install` doesn't care about the working directory at all
+    await execVolta('.', ['install', `npm${version === 'true' ? '' : `@${version}`}`]);
 }
 async function installYarn(version) {
-    await execVolta(['install', `yarn${version === 'true' ? '' : `@${version}`}`]);
+    // using `.` here because `volta install` doesn't care about the working directory at all
+    await execVolta('.', ['install', `yarn${version === 'true' ? '' : `@${version}`}`]);
 }
-async function pinNode(version) {
-    await execVolta(['pin', `node${version === 'true' ? '' : `@${version}`}`]);
+async function pinNode(workingDirectory, version) {
+    await execVolta(workingDirectory, ['pin', `node${version === 'true' ? '' : `@${version}`}`]);
 }
-async function pinNpm(version) {
-    await execVolta(['pin', `npm${version === 'true' ? '' : `@${version}`}`]);
+async function pinNpm(workingDirectory, version) {
+    await execVolta(workingDirectory, ['pin', `npm${version === 'true' ? '' : `@${version}`}`]);
 }
-async function pinYarn(version) {
-    await execVolta(['pin', `yarn${version === 'true' ? '' : `@${version}`}`]);
+async function pinYarn(workingDirectory, version) {
+    await execVolta(workingDirectory, ['pin', `yarn${version === 'true' ? '' : `@${version}`}`]);
 }
 async function getVoltaVersion(versionSpec, authToken) {
     let version = semver.clean(versionSpec) || '';
@@ -23622,37 +23185,51 @@ async function addMatchers(matchersPath = __nccwpck_require__.ab + "matchers") {
 
 
 
+
 async function run() {
     try {
         const authToken = core.getInput('token', { required: false });
         const voltaVersion = core.getInput('volta-version', { required: false });
         const variant = core.getInput('variant', { required: false });
+        let packageJSONPath = core.getInput('package-json-path', { required: false });
+        const hasPackageJSONPath = packageJSONPath !== '';
+        if (hasPackageJSONPath && !(0,external_fs_.existsSync)(packageJSONPath)) {
+            core.setFailed(`custom \`package-json-path: ${packageJSONPath}\` was specified, but a file was not found at \`${packageJSONPath}\``);
+            return;
+        }
+        else if (!hasPackageJSONPath) {
+            packageJSONPath = 'package.json';
+        }
+        const hasPackageJSON = (0,external_fs_.existsSync)(packageJSONPath);
+        const workingDirectory = (0,external_path_.dirname)(packageJSONPath);
         await getVolta({ versionSpec: voltaVersion, authToken, variant });
-        const hasPackageJSON = await find_up_default()('package.json');
         const nodeVersion = core.getInput('node-version', { required: false });
         if (nodeVersion !== '') {
             core.info(`installing Node ${nodeVersion === 'true' ? '' : nodeVersion}`);
             await installNode(nodeVersion);
             if (hasPackageJSON) {
-                await pinNode(nodeVersion);
+                await pinNode(workingDirectory, nodeVersion);
+            }
+            else {
+                core.info(`no \`package.json\` file found, if your \`package.json\` is located somewhere other than the root of the working directory you can specify \`package-json-path\` to provide that location. `);
             }
         }
         const npmVersion = core.getInput('npm-version', { required: false });
         if (npmVersion !== '') {
-            core.info(`installing NPM ${npmVersion === 'true' ? '' : npmVersion}`);
+            core.info(`installing NPM ${npmVersion.toUpperCase() === 'TRUE' ? '' : npmVersion}`);
             await installNpm(npmVersion);
             // cannot pin `npm` when `node` is not pinned as well
             if (nodeVersion !== '' && hasPackageJSON) {
-                await pinNpm(npmVersion);
+                await pinNpm(workingDirectory, npmVersion);
             }
         }
         const yarnVersion = core.getInput('yarn-version', { required: false });
         if (yarnVersion !== '') {
-            core.info(`installing Yarn ${yarnVersion === 'true' ? '' : yarnVersion}`);
+            core.info(`installing Yarn ${yarnVersion.toUpperCase() === 'TRUE' ? '' : yarnVersion}`);
             await installYarn(yarnVersion);
             // cannot pin `yarn` when `node` is not pinned as well
             if (nodeVersion !== '' && hasPackageJSON) {
-                await pinYarn(yarnVersion);
+                await pinYarn(workingDirectory, yarnVersion);
             }
         }
         const registryUrl = core.getInput('registry-url', { required: false });

@@ -4,6 +4,19 @@
 
 
 
+
+## v4.0.0-beta.2 (2022-09-09)
+
+#### :rocket: Enhancement
+* [#107](https://github.com/volta-cli/action/pull/107) Add `package-json-path` input to specify location of `package.json` ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#106](https://github.com/volta-cli/action/pull/106) Update devDependencies to latest ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v4.0.0-beta.1 (2022-09-07)
 
 #### :boom: Breaking Change
