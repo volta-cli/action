@@ -101,6 +101,10 @@ describe('buildLayout', () => {
 });
 
 describe('getVoltaVersion', function () {
+  afterAll(() => {
+    nock.restore();
+  });
+
   it('without user provided volta version', async function () {
     try {
       const scope = nock('https://api.github.com')
@@ -111,7 +115,7 @@ describe('getVoltaVersion', function () {
 
       scope.done();
     } finally {
-      nock.restore();
+      nock.cleanAll();
     }
   });
 
@@ -125,5 +129,24 @@ describe('getVoltaVersion', function () {
     ).rejects.toThrowErrorMatchingInlineSnapshot(
       `"volta-cli/action: Volta version must be >= 1.0.0 (you specified 0.6.5)"`
     );
+  });
+
+  it('falls back to downloading from volta.sh/latest-version', async function () {
+    try {
+      const githubScope = nock('https://api.github.com')
+        .get('/repos/volta-cli/volta/releases/latest')
+        .reply(429, 'rate limit exceeded');
+
+      const voltaSHScope = nock('https://volta.sh')
+        .get('/latest-version')
+        .reply(200, '999.999.999');
+
+      expect(await getVoltaVersion('', 'some-token')).toEqual('999.999.999');
+
+      voltaSHScope.done();
+      githubScope.done();
+    } finally {
+      nock.cleanAll();
+    }
   });
 });
