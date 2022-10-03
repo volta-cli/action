@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        volta-version: ["1.0.0", "1.0.8"]
+        volta-version: ["1.0.0", "1.0.8", "1.1.0"]
         os: [ubuntu, macOS, windows]
 
     steps:

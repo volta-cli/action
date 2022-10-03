@@ -78,15 +78,19 @@ function voltaVersionHasSetup(version: string): boolean {
 
 export async function buildDownloadUrl(
   platform: string,
+  arch: string,
   version: string,
   variant = '',
   openSSLVersionForTesting = ''
 ): Promise<string> {
   let fileName = '';
 
+  const isOpenSSLDependent = semver.lt(version, '1.1.0');
+
   if (variant) {
     fileName = `volta-${version}-${variant}.tar.gz`;
-  } else {
+  } else if (isOpenSSLDependent) {
+    // TODO: remove this branch when support for volta < 1.1.0 is dropped
     switch (platform) {
       case 'darwin':
         fileName = `volta-${version}-macos.tar.gz`;
@@ -95,6 +99,21 @@ export async function buildDownloadUrl(
         const openSSLVersion = await getOpenSSLVersion(openSSLVersionForTesting);
 
         fileName = `volta-${version}-linux-${openSSLVersion}.tar.gz`;
+        break;
+      }
+      case 'win32':
+        fileName = `volta-${version}-windows-x86_64.msi`;
+        break;
+      default:
+        throw new Error(`your platform ${platform} is not yet supported`);
+    }
+  } else {
+    switch (platform) {
+      case 'darwin':
+        fileName = `volta-${version}-macos${arch === 'arm64' ? '-aarch64' : ''}.tar.gz`;
+        break;
+      case 'linux': {
+        fileName = `volta-${version}-linux.tar.gz`;
         break;
       }
       case 'win32':
@@ -201,7 +220,7 @@ async function acquireVolta(version: string, options: VoltaInstallOptions): Prom
 
   core.info(`downloading volta@${version}`);
 
-  const downloadUrl = await buildDownloadUrl(os.platform(), version, options.variant);
+  const downloadUrl = await buildDownloadUrl(os.platform(), os.arch(), version, options.variant);
 
   core.debug(`downloading from \`${downloadUrl}\``);
   const downloadPath = await tc.downloadTool(downloadUrl, undefined, options.authToken);
