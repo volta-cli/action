@@ -5,6 +5,18 @@
 
 
 
+
+## v4.0.0-beta.3 (2022-10-03)
+
+#### :bug: Bug Fix
+* [#110](https://github.com/volta-cli/action/pull/110) Fix for self-hoster runners (instead of relying on `RUNNER_TEMP`) ([@jeevcat](https://github.com/jeevcat))
+* [#111](https://github.com/volta-cli/action/pull/111) Fall back to downloading latest version from volta.sh on rate-limit ([@ZauberNerd](https://github.com/ZauberNerd))
+
+#### Committers: 2
+- Björn Brauer ([@ZauberNerd](https://github.com/ZauberNerd))
+- Sam Jeeves ([@jeevcat](https://github.com/jeevcat))
+
+
 ## v4.0.0-beta.2 (2022-09-09)
 
 #### :rocket: Enhancement

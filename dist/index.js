@@ -22839,14 +22839,14 @@ var core = __nccwpck_require__(2186);
 var external_fs_ = __nccwpck_require__(7147);
 // EXTERNAL MODULE: external "path"
 var external_path_ = __nccwpck_require__(1017);
-// EXTERNAL MODULE: ./node_modules/@actions/http-client/lib/index.js
-var lib = __nccwpck_require__(6255);
-// EXTERNAL MODULE: ./node_modules/@actions/tool-cache/lib/tool-cache.js
-var tool_cache = __nccwpck_require__(7784);
-// EXTERNAL MODULE: ./node_modules/@actions/io/lib/io.js
-var io = __nccwpck_require__(7436);
 // EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
 var exec = __nccwpck_require__(1514);
+// EXTERNAL MODULE: ./node_modules/@actions/http-client/lib/index.js
+var lib = __nccwpck_require__(6255);
+// EXTERNAL MODULE: ./node_modules/@actions/io/lib/io.js
+var io = __nccwpck_require__(7436);
+// EXTERNAL MODULE: ./node_modules/@actions/tool-cache/lib/tool-cache.js
+var tool_cache = __nccwpck_require__(7784);
 // EXTERNAL MODULE: external "os"
 var external_os_ = __nccwpck_require__(2037);
 // EXTERNAL MODULE: ./node_modules/semver/index.js
@@ -22888,11 +22888,36 @@ async function getLatestVolta(authToken) {
             authorization: authToken,
         };
     }
-    const response = await http.getJson(url, headers);
-    if (!response.result) {
+    try {
+        const response = await http.getJson(url, headers);
+        if (!response.result) {
+            throw new Error(`volta-cli/action: Could not download latest release from ${url}`);
+        }
+        return semver.clean(response.result.name);
+    }
+    catch (error) {
+        if (error instanceof lib.HttpClientError &&
+            (error.statusCode === 403 || error.statusCode === 429)) {
+            core.info(`Received HTTP status code ${error.statusCode}. This usually indicates the rate limit has been exceeded`);
+            return await getLatestVoltaFromVoltaSH();
+        }
+        else {
+            throw error;
+        }
+    }
+}
+async function getLatestVoltaFromVoltaSH() {
+    const url = 'https://volta.sh/latest-version';
+    core.info(`Falling back to download from ${url}`);
+    const http = new lib.HttpClient('volta-cli/action', [], {
+        allowRetries: true,
+        maxRetries: 3,
+    });
+    const response = await http.get(url);
+    if (response.message.statusCode !== 200) {
         throw new Error(`volta-cli/action: Could not download latest release from ${url}`);
     }
-    return semver.clean(response.result.name);
+    return semver.clean(await response.readBody());
 }
 function voltaVersionHasSetup(version) {
     return semver.gte(version, '0.7.0');
@@ -23025,7 +23050,8 @@ async function acquireVolta(version, options) {
 }
 async function setupVolta(version, voltaHome) {
     if (voltaVersionHasSetup(version)) {
-        await (0,exec.exec)(external_path_.join(voltaHome, 'bin', 'volta'), ['setup'], {
+        const executable = external_path_.join(voltaHome, 'bin', 'volta');
+        await (0,exec.exec)(executable, ['setup'], {
             env: {
                 // VOLTA_HOME needs to be set before calling volta setup
                 VOLTA_HOME: voltaHome,
@@ -23095,10 +23121,10 @@ async function getVolta(options) {
     if (voltaHome === '') {
         // download, extract, cache
         const toolRoot = await acquireVolta(version, options);
-        await setupVolta(version, toolRoot);
         // Install into the local tool cache - node extracts with a root folder
         // that matches the fileName downloaded
         voltaHome = await tool_cache.cacheDir(toolRoot, 'volta', version);
+        await setupVolta(version, voltaHome);
         core.info(`caching volta@${version} into ${voltaHome}`);
     }
     else {
