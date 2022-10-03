@@ -7,6 +7,30 @@
 
 
 
+## v4.0.0 (2022-10-03)
+
+#### :boom: Breaking Change
+* [#102](https://github.com/volta-cli/action/pull/102) Replace `openssl-version` configuration with `variant` ([@scalvert](https://github.com/scalvert))
+
+#### :memo: Documentation
+* [#104](https://github.com/volta-cli/action/pull/104) Add action-docs updater ([@rwjblue](https://github.com/rwjblue))
+* [#103](https://github.com/volta-cli/action/pull/103) Remove reference to https://volta.sh/latest-version in logging ([@rwjblue](https://github.com/rwjblue))
+
+#### :rocket: Enhancement
+* [#107](https://github.com/volta-cli/action/pull/107) Add `package-json-path` input to specify location of `package.json` ([@rwjblue](https://github.com/rwjblue))
+
+#### :bug: Bug Fix
+* [#110](https://github.com/volta-cli/action/pull/110) Fix for self-hoster runners (instead of relying on `RUNNER_TEMP`) ([@jeevcat](https://github.com/jeevcat))
+* [#111](https://github.com/volta-cli/action/pull/111) Fall back to downloading latest version from volta.sh on rate-limit ([@ZauberNerd](https://github.com/ZauberNerd))
+* [#115](https://github.com/volta-cli/action/pull/115) Add support for Volta 1.1.0 ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 4
+- Björn Brauer ([@ZauberNerd](https://github.com/ZauberNerd))
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- Sam Jeeves ([@jeevcat](https://github.com/jeevcat))
+- Steve Calvert ([@scalvert](https://github.com/scalvert))
+
+
 ## v4.0.0-beta.4 (2022-10-03)
 
 #### :bug: Bug Fix
