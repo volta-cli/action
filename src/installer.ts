@@ -31,12 +31,45 @@ async function getLatestVolta(authToken: string): Promise<string> {
     };
   }
 
-  const response = await http.getJson<{ name: string }>(url, headers);
-  if (!response.result) {
+  try {
+    const response = await http.getJson<{ name: string }>(url, headers);
+    if (!response.result) {
+      throw new Error(`volta-cli/action: Could not download latest release from ${url}`);
+    }
+
+    return semver.clean(response.result.name) as string;
+  } catch (error: unknown) {
+    if (
+      error instanceof hc.HttpClientError &&
+      (error.statusCode === 403 || error.statusCode === 429)
+    ) {
+      core.info(
+        `Received HTTP status code ${error.statusCode}. This usually indicates the rate limit has been exceeded`
+      );
+
+      return await getLatestVoltaFromVoltaSH();
+    } else {
+      throw error;
+    }
+  }
+}
+
+async function getLatestVoltaFromVoltaSH(): Promise<string> {
+  const url = 'https://volta.sh/latest-version';
+
+  core.info(`Falling back to download from ${url}`);
+
+  const http = new hc.HttpClient('volta-cli/action', [], {
+    allowRetries: true,
+    maxRetries: 3,
+  });
+
+  const response = await http.get(url);
+  if (response.message.statusCode !== 200) {
     throw new Error(`volta-cli/action: Could not download latest release from ${url}`);
   }
 
-  return semver.clean(response.result.name) as string;
+  return semver.clean(await response.readBody()) as string;
 }
 
 function voltaVersionHasSetup(version: string): boolean {
