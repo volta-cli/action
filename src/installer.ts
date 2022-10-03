@@ -1,13 +1,13 @@
 import * as core from '@actions/core';
-import * as hc from '@actions/http-client';
-import * as tc from '@actions/tool-cache';
-import * as io from '@actions/io';
 import { exec, ExecOptions } from '@actions/exec';
+import * as hc from '@actions/http-client';
+import * as io from '@actions/io';
+import * as tc from '@actions/tool-cache';
+import * as fs from 'fs';
 import type { OutgoingHttpHeaders } from 'http';
 import * as os from 'os';
 import * as path from 'path';
 import * as semver from 'semver';
-import * as fs from 'fs';
 import { v4 as uuidV4 } from 'uuid';
 
 type VoltaInstallOptions = {
@@ -242,7 +242,8 @@ async function acquireVolta(version: string, options: VoltaInstallOptions): Prom
 
 async function setupVolta(version: string, voltaHome: string): Promise<void> {
   if (voltaVersionHasSetup(version)) {
-    await exec(path.join(voltaHome, 'bin', 'volta'), ['setup'], {
+    const executable = path.join(voltaHome, 'bin', 'volta');
+    await exec(executable, ['setup'], {
       env: {
         // VOLTA_HOME needs to be set before calling volta setup
         VOLTA_HOME: voltaHome,
@@ -331,11 +332,11 @@ export async function getVolta(options: VoltaInstallOptions): Promise<void> {
     // download, extract, cache
     const toolRoot = await acquireVolta(version, options);
 
-    await setupVolta(version, toolRoot);
-
     // Install into the local tool cache - node extracts with a root folder
     // that matches the fileName downloaded
     voltaHome = await tc.cacheDir(toolRoot, 'volta', version);
+
+    await setupVolta(version, voltaHome);
 
     core.info(`caching volta@${version} into ${voltaHome}`);
   } else {
