@@ -22922,12 +22922,14 @@ async function getLatestVoltaFromVoltaSH() {
 function voltaVersionHasSetup(version) {
     return semver.gte(version, '0.7.0');
 }
-async function buildDownloadUrl(platform, version, variant = '', openSSLVersionForTesting = '') {
+async function buildDownloadUrl(platform, arch, version, variant = '', openSSLVersionForTesting = '') {
     let fileName = '';
+    const isOpenSSLDependent = semver.lt(version, '1.1.0');
     if (variant) {
         fileName = `volta-${version}-${variant}.tar.gz`;
     }
-    else {
+    else if (isOpenSSLDependent) {
+        // TODO: remove this branch when support for volta < 1.1.0 is dropped
         switch (platform) {
             case 'darwin':
                 fileName = `volta-${version}-macos.tar.gz`;
@@ -22935,6 +22937,22 @@ async function buildDownloadUrl(platform, version, variant = '', openSSLVersionF
             case 'linux': {
                 const openSSLVersion = await getOpenSSLVersion(openSSLVersionForTesting);
                 fileName = `volta-${version}-linux-${openSSLVersion}.tar.gz`;
+                break;
+            }
+            case 'win32':
+                fileName = `volta-${version}-windows-x86_64.msi`;
+                break;
+            default:
+                throw new Error(`your platform ${platform} is not yet supported`);
+        }
+    }
+    else {
+        switch (platform) {
+            case 'darwin':
+                fileName = `volta-${version}-macos${arch === 'arm64' ? '-aarch64' : ''}.tar.gz`;
+                break;
+            case 'linux': {
+                fileName = `volta-${version}-linux.tar.gz`;
                 break;
             }
             case 'win32':
@@ -23022,7 +23040,7 @@ async function acquireVolta(version, options) {
     // Download - a tool installer intimately knows how to get the tool (and construct urls)
     //
     core.info(`downloading volta@${version}`);
-    const downloadUrl = await buildDownloadUrl(external_os_.platform(), version, options.variant);
+    const downloadUrl = await buildDownloadUrl(external_os_.platform(), external_os_.arch(), version, options.variant);
     core.debug(`downloading from \`${downloadUrl}\``);
     const downloadPath = await tool_cache.downloadTool(downloadUrl, undefined, options.authToken);
     const voltaHome = external_path_.join(

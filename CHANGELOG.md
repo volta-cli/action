@@ -6,6 +6,16 @@
 
 
 
+
+## v4.0.0-beta.4 (2022-10-03)
+
+#### :bug: Bug Fix
+* [#115](https://github.com/volta-cli/action/pull/115) Add support for Volta 1.1.0 ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v4.0.0-beta.3 (2022-10-03)
 
 #### :bug: Bug Fix
