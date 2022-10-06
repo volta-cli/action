@@ -105,7 +105,7 @@ steps:
 - run: yarn test
 ```
 
-The `variant` fragment corresponds to a portion of the installer filename, and can be found in the [Volta Releases](https://github.com/volta-cli/action/releases) page.
+The `variant` fragment corresponds to a portion of the installer filename, and can be found in the [Volta Releases](https://github.com/volta-cli/volta/releases) page.
 
 ## License
 
