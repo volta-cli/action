@@ -21,20 +21,41 @@ function voltaVersionHasSetup(version: string): boolean {
   return semver.gte(version, '0.7.0');
 }
 
-export function buildDownloadUrl(platform: string, version: string): string {
+export function buildDownloadUrl(platform: string, arch: string, version: string): string {
   let fileName: string;
-  switch (platform) {
-    case 'darwin':
-      fileName = `volta-${version}-macos.tar.gz`;
-      break;
-    case 'linux':
-      fileName = `volta-${version}-linux-openssl-1.1.tar.gz`;
-      break;
-    case 'win32':
-      fileName = `volta-${version}-windows-x86_64.msi`;
-      break;
-    default:
-      throw new Error(`your platform ${platform} is not yet supported`);
+
+  const isOpenSSLDependent = semver.lt(version, '1.1.0');
+
+  if (isOpenSSLDependent) {
+    switch (platform) {
+      case 'darwin':
+        fileName = `volta-${version}-macos.tar.gz`;
+        break;
+      case 'linux': {
+        fileName = `volta-${version}-linux-openssl-1.1.tar.gz`;
+        break;
+      }
+      case 'win32':
+        fileName = `volta-${version}-windows-x86_64.msi`;
+        break;
+      default:
+        throw new Error(`your platform ${platform} is not yet supported`);
+    }
+  } else {
+    switch (platform) {
+      case 'darwin':
+        fileName = `volta-${version}-macos${arch === 'arm64' ? '-aarch64' : ''}.tar.gz`;
+        break;
+      case 'linux': {
+        fileName = `volta-${version}-linux.tar.gz`;
+        break;
+      }
+      case 'win32':
+        fileName = `volta-${version}-windows-x86_64.msi`;
+        break;
+      default:
+        throw new Error(`your platform ${platform} is not yet supported`);
+    }
   }
 
   return `https://github.com/volta-cli/volta/releases/download/v${version}/${fileName}`;
@@ -95,7 +116,7 @@ async function acquireVolta(version: string): Promise<string> {
 
   core.info(`downloading volta@${version}`);
 
-  const downloadUrl = buildDownloadUrl(os.platform(), version);
+  const downloadUrl = await buildDownloadUrl(os.platform(), os.arch(), version);
 
   core.debug(`downloading from \`${downloadUrl}\``);
   const downloadPath = await tc.downloadTool(downloadUrl);
