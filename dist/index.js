@@ -22674,22 +22674,41 @@ async function getLatestVolta(authToken) {
 function voltaVersionHasSetup(version) {
     return semver.gte(version, '0.7.0');
 }
-async function buildDownloadUrl(platform, version, openSSLVersion = '') {
+async function buildDownloadUrl(platform, arch, version, openSSLVersion = '') {
     let fileName;
-    switch (platform) {
-        case 'darwin':
-            fileName = `volta-${version}-macos.tar.gz`;
-            break;
-        case 'linux': {
-            openSSLVersion = await getOpenSSLVersion(openSSLVersion);
-            fileName = `volta-${version}-linux-${openSSLVersion}.tar.gz`;
-            break;
+    const isOpenSSLDependent = semver.lt(version, '1.1.0');
+    if (isOpenSSLDependent) {
+        switch (platform) {
+            case 'darwin':
+                fileName = `volta-${version}-macos.tar.gz`;
+                break;
+            case 'linux': {
+                openSSLVersion = await getOpenSSLVersion(openSSLVersion);
+                fileName = `volta-${version}-linux-${openSSLVersion}.tar.gz`;
+                break;
+            }
+            case 'win32':
+                fileName = `volta-${version}-windows-x86_64.msi`;
+                break;
+            default:
+                throw new Error(`your platform ${platform} is not yet supported`);
         }
-        case 'win32':
-            fileName = `volta-${version}-windows-x86_64.msi`;
-            break;
-        default:
-            throw new Error(`your platform ${platform} is not yet supported`);
+    }
+    else {
+        switch (platform) {
+            case 'darwin':
+                fileName = `volta-${version}-macos${arch === 'arm64' ? '-aarch64' : ''}.tar.gz`;
+                break;
+            case 'linux': {
+                fileName = `volta-${version}-linux.tar.gz`;
+                break;
+            }
+            case 'win32':
+                fileName = `volta-${version}-windows-x86_64.msi`;
+                break;
+            default:
+                throw new Error(`your platform ${platform} is not yet supported`);
+        }
     }
     return `https://github.com/volta-cli/volta/releases/download/v${version}/${fileName}`;
 }
@@ -22773,7 +22792,7 @@ async function acquireVolta(version, authToken, openSSLVersion) {
     // Download - a tool installer intimately knows how to get the tool (and construct urls)
     //
     core.info(`downloading volta@${version}`);
-    const downloadUrl = await buildDownloadUrl(external_os_.platform(), version, openSSLVersion);
+    const downloadUrl = await buildDownloadUrl(external_os_.platform(), external_os_.arch(), version, openSSLVersion);
     core.debug(`downloading from \`${downloadUrl}\``);
     const downloadPath = await tool_cache.downloadTool(downloadUrl, undefined, authToken);
     const voltaHome = external_path_.join(
