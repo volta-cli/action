@@ -1,3 +1,4 @@
+import { createRequire as __WEBPACK_EXTERNAL_createRequire } from "module";
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -30239,22 +30240,41 @@ async function getLatestVolta() {
 function voltaVersionHasSetup(version) {
     return semver.gte(version, '0.7.0');
 }
-async function buildDownloadUrl(platform, version, openSSLVersion = '') {
+async function buildDownloadUrl(platform, arch, version, openSSLVersion = '') {
     let fileName;
-    switch (platform) {
-        case 'darwin':
-            fileName = `volta-${version}-macos.tar.gz`;
-            break;
-        case 'linux': {
-            openSSLVersion = await getOpenSSLVersion(openSSLVersion);
-            fileName = `volta-${version}-linux-${openSSLVersion}.tar.gz`;
-            break;
+    const isOpenSSLDependent = semver.lt(version, '1.1.0');
+    if (isOpenSSLDependent) {
+        switch (platform) {
+            case 'darwin':
+                fileName = `volta-${version}-macos.tar.gz`;
+                break;
+            case 'linux': {
+                openSSLVersion = await getOpenSSLVersion(openSSLVersion);
+                fileName = `volta-${version}-linux-${openSSLVersion}.tar.gz`;
+                break;
+            }
+            case 'win32':
+                fileName = `volta-${version}-windows-x86_64.msi`;
+                break;
+            default:
+                throw new Error(`your platform ${platform} is not yet supported`);
         }
-        case 'win32':
-            fileName = `volta-${version}-windows-x86_64.msi`;
-            break;
-        default:
-            throw new Error(`your platform ${platform} is not yet supported`);
+    }
+    else {
+        switch (platform) {
+            case 'darwin':
+                fileName = `volta-${version}-macos${arch === 'arm64' ? '-aarch64' : ''}.tar.gz`;
+                break;
+            case 'linux': {
+                fileName = `volta-${version}-linux.tar.gz`;
+                break;
+            }
+            case 'win32':
+                fileName = `volta-${version}-windows-x86_64.msi`;
+                break;
+            default:
+                throw new Error(`your platform ${platform} is not yet supported`);
+        }
     }
     return `https://github.com/volta-cli/volta/releases/download/v${version}/${fileName}`;
 }
@@ -30335,7 +30355,7 @@ async function acquireVolta(version) {
     // Download - a tool installer intimately knows how to get the tool (and construct urls)
     //
     core.info(`downloading volta@${version}`);
-    const downloadUrl = await buildDownloadUrl(os.platform(), version);
+    const downloadUrl = await buildDownloadUrl(os.platform(), os.arch(), version);
     core.debug(`downloading from \`${downloadUrl}\``);
     const downloadPath = await tc.downloadTool(downloadUrl);
     const voltaHome = path.join(
@@ -30576,7 +30596,7 @@ exports.writeRegistryToFile = writeRegistryToFile;
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("assert");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("assert");
 
 /***/ }),
 
@@ -30584,7 +30604,7 @@ module.exports = require("assert");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("buffer");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("buffer");
 
 /***/ }),
 
@@ -30592,7 +30612,7 @@ module.exports = require("buffer");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("child_process");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("child_process");
 
 /***/ }),
 
@@ -30600,7 +30620,7 @@ module.exports = require("child_process");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("crypto");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("crypto");
 
 /***/ }),
 
@@ -30616,7 +30636,7 @@ module.exports = require("dns");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("events");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("events");
 
 /***/ }),
 
@@ -30624,7 +30644,7 @@ module.exports = require("events");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("fs");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("fs");
 
 /***/ }),
 
@@ -30632,7 +30652,7 @@ module.exports = require("fs");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("http");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("http");
 
 /***/ }),
 
@@ -30648,7 +30668,7 @@ module.exports = require("http2");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("https");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("https");
 
 /***/ }),
 
@@ -30656,7 +30676,7 @@ module.exports = require("https");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("net");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("net");
 
 /***/ }),
 
@@ -30664,7 +30684,7 @@ module.exports = require("net");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("os");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("os");
 
 /***/ }),
 
@@ -30672,7 +30692,7 @@ module.exports = require("os");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("path");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("path");
 
 /***/ }),
 
@@ -30680,7 +30700,7 @@ module.exports = require("path");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("punycode");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("punycode");
 
 /***/ }),
 
@@ -30688,7 +30708,7 @@ module.exports = require("punycode");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("stream");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("stream");
 
 /***/ }),
 
@@ -30696,7 +30716,7 @@ module.exports = require("stream");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("string_decoder");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("string_decoder");
 
 /***/ }),
 
@@ -30704,7 +30724,7 @@ module.exports = require("string_decoder");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("timers");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("timers");
 
 /***/ }),
 
@@ -30712,7 +30732,7 @@ module.exports = require("timers");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("tls");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("tls");
 
 /***/ }),
 
@@ -30720,7 +30740,7 @@ module.exports = require("tls");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("url");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("url");
 
 /***/ }),
 
@@ -30728,7 +30748,7 @@ module.exports = require("url");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("util");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("util");
 
 /***/ }),
 
@@ -30736,7 +30756,7 @@ module.exports = require("util");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("zlib");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("zlib");
 
 /***/ }),
 

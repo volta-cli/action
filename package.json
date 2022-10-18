@@ -1,6 +1,6 @@
 {
   "name": "@volta-cli/action",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "private": true,
   "description": "Setup volta for usage in your CI runs",
   "keywords": [
