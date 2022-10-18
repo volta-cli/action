@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.7.1 (2022-10-18)
+
+#### :bug: Bug Fix
+* [#120](https://github.com/volta-cli/action/pull/120) [BACKPORT] Add volta@1.1.0 support to v1.x release ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v1.7.0 (2021-03-03)
 
 #### :rocket: Enhancement
