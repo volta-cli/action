@@ -38,7 +38,7 @@ Basic (when the project's `package.json` has a `volta` property with `node` and/
 ```yaml
 steps:
 - uses: actions/checkout@v3
-- uses: volta-cli/action@v3
+- uses: volta-cli/action@v4
 - run: npm install
 - run: npm test
 ```
@@ -48,7 +48,7 @@ Manually specifying node and/or yarn versions (e.g. to test a project without `v
 ```yaml
 steps:
 - uses: actions/checkout@v3
-- uses: volta-cli/action@v3
+- uses: volta-cli/action@v4
   with:
     node-version: 18.x
     yarn-version: 1.19.1
@@ -66,7 +66,7 @@ strategy:
 
 steps:
 - uses: actions/checkout@v3
-- uses: volta-cli/action@v3
+- uses: volta-cli/action@v4
   with:
     node-version: ${{ matrix.node-version }}
 
@@ -83,7 +83,7 @@ strategy:
 
 steps:
 - uses: actions/checkout@v3
-- uses: volta-cli/action@v3
+- uses: volta-cli/action@v4
   with:
     node-version: ${{ matrix.node-version }}
     npm-version: '7'
@@ -97,7 +97,7 @@ In some cases, you may know the particular variant of the installer that you wan
 ```yaml
 steps:
 - uses: actions/checkout@v3
-- uses: volta-cli/action@v3
+- uses: volta-cli/action@v4
   with:
     variant: 'linux-openssl-rhel'
 
