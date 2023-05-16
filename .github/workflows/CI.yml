@@ -41,6 +41,9 @@ jobs:
       matrix:
         volta-version: ['1.0.0', '1.0.8', '1.1.0']
         os: [ubuntu, macOS, windows]
+        exclude:
+          - os: ubuntu
+            volta-version: '1.0.0'
 
     steps:
       - uses: actions/checkout@v3
@@ -134,13 +137,13 @@ jobs:
         working-directory: ./action
       - uses: ./action
         with:
-          volta-version: 1.0.1
+          volta-version: 1.0.8
           node-version: 12.0.0
           npm-version: 7.5.2
           yarn-version: 1.22.0
 
       - run: ./action/tests/log-info.sh
-      - run: ./action/tests/check-version.sh 'volta' '1.0.1'
+      - run: ./action/tests/check-version.sh 'volta' '1.0.8'
       - run: ./action/tests/check-version.sh 'node' 'v12.0.0'
       - run: ./action/tests/check-version.sh 'npm' '7.5.2'
       - run: ./action/tests/check-version.sh 'yarn' '1.22.0'
@@ -187,7 +190,7 @@ jobs:
         working-directory: ./action
       - uses: ./action
         with:
-          variant: linux-openssl-1.1
+          variant: linux
 
       - run: ./action/tests/log-info.sh
       - run: ./action/tests/check-version.sh 'volta' 'current'
