@@ -17,6 +17,8 @@ type VoltaInstallOptions = {
 };
 
 async function getLatestVolta(authToken: string): Promise<string> {
+  core.startGroup('Determine the latest volta version');
+
   const url = 'https://api.github.com/repos/volta-cli/volta/releases/latest';
 
   const http = new hc.HttpClient('volta-cli/action', [], {
@@ -32,12 +34,17 @@ async function getLatestVolta(authToken: string): Promise<string> {
   }
 
   try {
+    core.info(`Retrieving release info from ${url}`);
     const response = await http.getJson<{ name: string }>(url, headers);
     if (!response.result) {
       throw new Error(`volta-cli/action: Could not download latest release from ${url}`);
     }
 
-    return semver.clean(response.result.name) as string;
+    const result = semver.clean(response.result.name) as string;
+
+    core.info(`Latest volta version is ${result}`);
+
+    return result;
   } catch (error: unknown) {
     if (
       error instanceof hc.HttpClientError &&
@@ -47,26 +54,46 @@ async function getLatestVolta(authToken: string): Promise<string> {
         `Received HTTP status code ${error.statusCode}. This usually indicates the rate limit has been exceeded`
       );
 
-      return await getLatestVoltaFromVoltaSH();
+      const result = await getLatestVoltaFromVoltaSH();
+
+      core.info(`Latest volta version is ${result}`);
+
+      return result;
     } else {
+      core.info(`Failed to determine latest volta release from ${url}: ${error}`);
+
       throw error;
     }
+  } finally {
+    core.endGroup();
   }
 }
 
 async function getLatestVoltaFromVoltaSH(): Promise<string> {
   const url = 'https://volta.sh/latest-version';
 
-  core.info(`Falling back to download from ${url}`);
+  core.info(`Falling back to determine latest volta version from ${url}`);
 
   const http = new hc.HttpClient('volta-cli/action', [], {
     allowRetries: true,
     maxRetries: 3,
   });
 
-  const response = await http.get(url);
+  let response: hc.HttpClientResponse;
+  try {
+    response = await http.get(url);
+  } catch (error: unknown) {
+    core.setFailed(`Action failed with error ${error}`);
+
+    throw error;
+  }
+
   if (response.message.statusCode !== 200) {
-    throw new Error(`volta-cli/action: Could not download latest release from ${url}`);
+    const message = `volta-cli/action: Could not download latest release from ${url}: ${response.message.statusMessage}`;
+
+    core.setFailed(message);
+
+    throw new Error(message);
   }
 
   return semver.clean(await response.readBody()) as string;
@@ -149,6 +176,8 @@ export async function getOpenSSLVersion(version = ''): Promise<string> {
 }
 
 async function execOpenSSLVersion() {
+  core.info('determining openssl version');
+
   let output = '';
   const options: ExecOptions = {};
   options.listeners = {
@@ -218,50 +247,57 @@ async function acquireVolta(version: string, options: VoltaInstallOptions): Prom
   // Download - a tool installer intimately knows how to get the tool (and construct urls)
   //
 
-  core.info(`downloading volta@${version}`);
+  core.startGroup(`downloading volta@${version}`);
 
-  const downloadUrl = await buildDownloadUrl(os.platform(), os.arch(), version, options.variant);
+  try {
+    const downloadUrl = await buildDownloadUrl(os.platform(), os.arch(), version, options.variant);
 
-  core.debug(`downloading from \`${downloadUrl}\``);
-  const downloadPath = await tc.downloadTool(downloadUrl, undefined, options.authToken);
+    core.info(`downloading volta from \`${downloadUrl}\``);
+    const downloadPath = await tc.downloadTool(downloadUrl, undefined, options.authToken);
 
-  const voltaHome = path.join(
-    // `RUNNER_TEMP` is used by @actions/tool-cache
-    process.env['RUNNER_TEMP'] || '',
-    uuidV4()
-  );
-
-  await io.mkdirP(voltaHome);
-
-  //
-  // Extract
-  //
-  const voltaHomeBin = path.join(voltaHome, 'bin');
-  core.debug(`extracting from \`${downloadPath}\` into \`${voltaHomeBin}\``);
-  if (os.platform() === 'win32') {
-    const tmpExtractTarget = path.join(
+    const voltaHome = path.join(
       // `RUNNER_TEMP` is used by @actions/tool-cache
       process.env['RUNNER_TEMP'] || '',
       uuidV4()
     );
-    const msiexecPath = await io.which('msiexec', true);
 
-    await exec(msiexecPath, ['/a', downloadPath, '/qn', `TARGETDIR=${tmpExtractTarget}`]);
-    await io.cp(path.join(tmpExtractTarget, 'PFiles', 'volta'), voltaHomeBin, { recursive: true });
-  } else {
-    await tc.extractTar(downloadPath, voltaHomeBin);
+    await io.mkdirP(voltaHome);
+
+    //
+    // Extract
+    //
+    const voltaHomeBin = path.join(voltaHome, 'bin');
+    core.debug(`extracting from \`${downloadPath}\` into \`${voltaHomeBin}\``);
+    if (os.platform() === 'win32') {
+      const tmpExtractTarget = path.join(
+        // `RUNNER_TEMP` is used by @actions/tool-cache
+        process.env['RUNNER_TEMP'] || '',
+        uuidV4()
+      );
+      const msiexecPath = await io.which('msiexec', true);
+
+      await exec(msiexecPath, ['/a', downloadPath, '/qn', `TARGETDIR=${tmpExtractTarget}`]);
+      await io.cp(path.join(tmpExtractTarget, 'PFiles', 'volta'), voltaHomeBin, {
+        recursive: true,
+      });
+    } else {
+      await tc.extractTar(downloadPath, voltaHomeBin);
+    }
+
+    core.debug(
+      `extracted "${fs.readdirSync(voltaHomeBin).join('","')}" from tarball into '${voltaHomeBin}'`
+    );
+
+    return voltaHome;
+  } finally {
+    core.endGroup();
   }
-
-  core.debug(
-    `extracted "${fs.readdirSync(voltaHomeBin).join('","')}" from tarball into '${voltaHomeBin}'`
-  );
-
-  return voltaHome;
 }
 
 async function setupVolta(version: string, voltaHome: string): Promise<void> {
   if (voltaVersionHasSetup(version)) {
     const executable = path.join(voltaHome, 'bin', 'volta');
+    core.info(`executing \`${executable} setup\``);
     await exec(executable, ['setup'], {
       env: {
         // VOLTA_HOME needs to be set before calling volta setup
