@@ -1,3 +1,4 @@
+import { afterEach, describe, test, expect } from 'vitest';
 import * as path from 'path';
 import { writeRegistryToFile } from './registry';
 import { createTempDir } from 'broccoli-test-helper';
@@ -15,12 +16,12 @@ describe('registry', () => {
     await writeRegistryToFile(path.join(tmpdir.path(), '.npmrc'), 'some.registry.url', 'false');
 
     expect(tmpdir.read()).toMatchInlineSnapshot(`
-Object {
-  ".npmrc": "some.registry.url:_authToken=\${NODE_AUTH_TOKEN}
-registry=some.registry.url
-always-auth=false",
-}
-`);
+      {
+        ".npmrc": "some.registry.url:_authToken=\${NODE_AUTH_TOKEN}
+      registry=some.registry.url
+      always-auth=false",
+      }
+    `);
   });
 
   test('includes existing npmrc', async () => {
@@ -33,12 +34,12 @@ always-auth=false",
     await writeRegistryToFile(path.join(tmpdir.path(), '.npmrc'), 'some.registry.url', 'false');
 
     expect(tmpdir.read()).toMatchInlineSnapshot(`
-Object {
-  ".npmrc": "some-scope:registry=https://npm.pkg.github.com
-some.registry.url:_authToken=\${NODE_AUTH_TOKEN}
-registry=some.registry.url
-always-auth=false",
-}
-`);
+      {
+        ".npmrc": "some-scope:registry=https://npm.pkg.github.com
+      some.registry.url:_authToken=\${NODE_AUTH_TOKEN}
+      registry=some.registry.url
+      always-auth=false",
+      }
+    `);
   });
 });

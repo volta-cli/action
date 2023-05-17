@@ -1,3 +1,4 @@
+import { afterAll, describe, test, it, expect } from 'vitest';
 import { buildLayout, buildDownloadUrl, getVoltaVersion, getOpenSSLVersion } from './installer';
 import { createTempDir } from 'broccoli-test-helper';
 import nock from 'nock';
@@ -121,31 +122,31 @@ describe('buildLayout', () => {
     await buildLayout(tmpdir.path());
 
     expect(tmpdir.read()).toMatchInlineSnapshot(`
-      Object {
-        "bin": Object {
+      {
+        "bin": {
           "node": "shim-file-here",
           "npm": "shim-file-here",
           "npx": "shim-file-here",
           "shim": "shim-file-here",
           "yarn": "shim-file-here",
         },
-        "cache": Object {
-          "node": Object {},
+        "cache": {
+          "node": {},
         },
-        "log": Object {},
-        "tmp": Object {},
-        "tools": Object {
-          "image": Object {
-            "node": Object {},
-            "packages": Object {},
-            "yarn": Object {},
+        "log": {},
+        "tmp": {},
+        "tools": {
+          "image": {
+            "node": {},
+            "packages": {},
+            "yarn": {},
           },
-          "inventory": Object {
-            "node": Object {},
-            "packages": Object {},
-            "yarn": Object {},
+          "inventory": {
+            "node": {},
+            "packages": {},
+            "yarn": {},
           },
-          "user": Object {},
+          "user": {},
         },
       }
     `);

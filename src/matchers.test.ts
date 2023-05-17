@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, test, expect } from 'vitest';
 import * as path from 'path';
 import addMatchers from './matchers';
 import { createTempDir } from 'broccoli-test-helper';
