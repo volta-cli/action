@@ -13,7 +13,7 @@ This action installs [volta](https://volta.sh) by:
 ## Inputs
 
 | parameter | description | required | default |
-| - | - | - | - |
+| --- | --- | --- | --- |
 | volta-version | Version of `volta` to fetch and setup. Examples: 0.6.0, 10.15.1, >=10.15.0 | `false` |  |
 | node-version | Version Spec of the node version to use.  Examples: 10.6.x, 10.15.1, >=10.15.0 | `false` |  |
 | npm-version | Version Spec of the npm version to use.  Examples: 7.5.x, 7.5.3, >=7.5.3 | `false` |  |
@@ -24,9 +24,6 @@ This action installs [volta](https://volta.sh) by:
 | scope | Optional scope for authenticating against scoped registries. Will fall back to the repository owner when using the GitHub Packages registry (https://npm.pkg.github.com/). | `false` |  |
 | token | Used to avoid low rate limiting for cached tool downloads.  Since there's a default, this is typically not supplied by the user. | `false` | ${{ github.token }} |
 | always-auth | Set always-auth in npmrc | `false` | false |
-
-
-
 <!-- action-docs-inputs -->
 
 ## Usage

@@ -7,6 +7,29 @@
 
 
 
+
+## v4.0.1 (2023-05-17)
+
+#### :memo: Documentation
+* [#125](https://github.com/volta-cli/action/pull/125) docs: update examples with v4 release ([@Maxwell2022](https://github.com/Maxwell2022))
+* [#128](https://github.com/volta-cli/action/pull/128) Use v4 in readme examples ([@otahontas](https://github.com/otahontas))
+* [#116](https://github.com/volta-cli/action/pull/116) Update link to Volta releases page ([@alexlafroscia](https://github.com/alexlafroscia))
+
+#### :house: Internal
+* [#135](https://github.com/volta-cli/action/pull/135) Update dependencies & devDependencies to latest ([@rwjblue](https://github.com/rwjblue))
+* [#134](https://github.com/volta-cli/action/pull/134) Update release-it (and plugins) to latest ([@rwjblue](https://github.com/rwjblue))
+* [#133](https://github.com/volta-cli/action/pull/133) Add more logging (to more easily identify failures) ([@rwjblue](https://github.com/rwjblue))
+* [#132](https://github.com/volta-cli/action/pull/132) Migrate to vitest ([@rwjblue](https://github.com/rwjblue))
+* [#130](https://github.com/volta-cli/action/pull/130) Update in-range dependencies & devDependencies to latest ([@rwjblue](https://github.com/rwjblue))
+* [#131](https://github.com/volta-cli/action/pull/131) Avoid CI errors when testing volta@1.0.0 with OpenSSL 3  ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 4
+- Alex LaFroscia ([@alexlafroscia](https://github.com/alexlafroscia))
+- Maxime ([@Maxwell2022](https://github.com/Maxwell2022))
+- Otto Ahoniemi ([@otahontas](https://github.com/otahontas))
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v4.0.0 (2022-10-03)
 
 #### :boom: Breaking Change
