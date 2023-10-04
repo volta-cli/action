@@ -378,7 +378,7 @@ export async function getVoltaVersion(versionSpec: string, authToken: string): P
   return version;
 }
 
-export async function getVolta(options: VoltaInstallOptions): Promise<void> {
+export async function getVolta(options: VoltaInstallOptions): Promise<string> {
   const version = await getVoltaVersion(options.versionSpec, options.authToken);
 
   let voltaHome = tc.find('volta', version);
@@ -399,12 +399,12 @@ export async function getVolta(options: VoltaInstallOptions): Promise<void> {
   }
 
   // prepend the tools path. instructs the agent to prepend for future tasks
-  if (voltaHome !== undefined) {
-    const binPath = path.join(voltaHome, 'bin');
+  const binPath = path.join(voltaHome, 'bin');
 
-    core.info(`adding ${binPath} to $PATH`);
+  core.info(`adding ${binPath} to $PATH`);
 
-    core.addPath(binPath);
-    core.exportVariable('VOLTA_HOME', voltaHome);
-  }
+  core.addPath(binPath);
+  core.exportVariable('VOLTA_HOME', voltaHome);
+
+  return voltaHome;
 }

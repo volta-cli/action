@@ -1,8 +1,10 @@
 import * as core from '@actions/core';
 import { existsSync } from 'fs';
 import { dirname } from 'path';
+import * as inventoryCache from './cache/inventory';
 import * as installer from './installer';
 import * as registry from './registry';
+import * as stateKeys from './state-keys';
 import addMatchers from './matchers';
 
 async function run(): Promise<void> {
@@ -25,7 +27,9 @@ async function run(): Promise<void> {
     const hasPackageJSON = existsSync(packageJSONPath);
     const workingDirectory = dirname(packageJSONPath);
 
-    await installer.getVolta({ versionSpec: voltaVersion, authToken, variant });
+    const voltaHome = await installer.getVolta({ versionSpec: voltaVersion, authToken, variant });
+    core.saveState(stateKeys.VOLTA_HOME, voltaHome);
+    await inventoryCache.restoreInventory(voltaHome);
 
     const nodeVersion = core.getInput('node-version', { required: false });
     if (nodeVersion !== '') {
