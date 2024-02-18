@@ -19,7 +19,7 @@
   "scripts": {
     "build": "npm-run-all build:clean build:ts build:dist build:docs",
     "build:clean": "rimraf dist lib",
-    "build:dist": "ncc build src/index.ts",
+    "build:dist": "ncc build src/index.ts && ncc build src/cache.ts -o dist-post",
     "build:ts": "tsc",
     "build:docs": "action-docs --update-readme",
     "lint": "npm-run-all lint:*",
@@ -28,6 +28,7 @@
     "test": "vitest"
   },
   "devDependencies": {
+    "@actions/cache": "^3.2.2",
     "@actions/core": "^1.10.0",
     "@actions/exec": "^1.1.1",
     "@actions/github": "^5.1.1",
