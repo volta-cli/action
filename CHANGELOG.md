@@ -9,6 +9,16 @@
 
 
 
+
+## v4.1.1 (2024-03-14)
+
+#### :house: Internal
+* [#148](https://github.com/volta-cli/action/pull/148) Re-roll lockfile. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v4.1.0 (2024-03-14)
 
 #### :bug: Bug Fix
