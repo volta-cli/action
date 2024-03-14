@@ -8,6 +8,16 @@
 
 
 
+
+## v4.1.0 (2024-03-14)
+
+#### :bug: Bug Fix
+* [#143](https://github.com/volta-cli/action/pull/143) Update node to v20 (fix Node 16 deprecation) ([@stijnvn](https://github.com/stijnvn))
+
+#### Committers: 1
+- Stijn Van Nieuwenhuyse ([@stijnvn](https://github.com/stijnvn))
+
+
 ## v4.0.1 (2023-05-17)
 
 #### :memo: Documentation
