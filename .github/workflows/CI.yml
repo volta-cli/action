@@ -1,17 +1,17 @@
-name: 'CI'
+name: "CI"
 on:
   pull_request:
   push:
     branches:
       - master
-      - 'releases/*'
+      - "releases/*"
 
 defaults:
   run:
     shell: bash
 
 env:
-  NODE_OPTIONS: '--unhandled-rejections=strict'
+  NODE_OPTIONS: "--unhandled-rejections=strict"
 
 concurrency:
   group: ci-${{ github.head_ref || github.ref }}
@@ -19,14 +19,14 @@ concurrency:
 
 jobs:
   test:
-    runs-on: '${{ matrix.os }}-latest'
+    runs-on: "${{ matrix.os }}-latest"
 
     strategy:
       matrix:
         os: [ubuntu, macOS, windows]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - run: npm ci
       - run: npm run lint
@@ -34,19 +34,19 @@ jobs:
       - run: npm test
 
   test-specific-volta:
-    runs-on: '${{ matrix.os }}-latest'
+    runs-on: "${{ matrix.os }}-latest"
 
     strategy:
       fail-fast: false
       matrix:
-        volta-version: ['1.0.0', '1.0.8', '1.1.0']
+        volta-version: ["1.0.0", "1.0.8", "1.1.0"]
         os: [ubuntu, macOS, windows]
         exclude:
           - os: ubuntu
-            volta-version: '1.0.0'
+            volta-version: "1.0.0"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: action
       - run: npm ci
@@ -64,14 +64,14 @@ jobs:
       - run: ./action/tests/check-version.sh 'yarn' '1.19.0'
 
   test-no-options:
-    runs-on: '${{ matrix.os }}-latest'
+    runs-on: "${{ matrix.os }}-latest"
 
     strategy:
       matrix:
         os: [ubuntu, macOS, windows]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: action
 
@@ -89,18 +89,18 @@ jobs:
       - run: ./action/tests/check-version.sh 'yarn' '1.19.1'
 
   test-specified-node-npm-yarn-overrides-pinned-versions:
-    runs-on: '${{ matrix.os }}-latest'
+    runs-on: "${{ matrix.os }}-latest"
 
     strategy:
       matrix:
         os: [ubuntu, macOS, windows]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          ref: 'branch-for-testing-overriding-pinned-projects-in-ci'
+          ref: "branch-for-testing-overriding-pinned-projects-in-ci"
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: action
 
@@ -121,14 +121,14 @@ jobs:
       - run: ./action/tests/check-version.sh 'yarn' '1.22.0'
 
   test-specific-volta-node-npm-yarn:
-    runs-on: '${{ matrix.os }}-latest'
+    runs-on: "${{ matrix.os }}-latest"
 
     strategy:
       matrix:
         os: [ubuntu, macOS, windows]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: action
       - run: npm ci
@@ -149,7 +149,7 @@ jobs:
       - run: ./action/tests/check-version.sh 'yarn' '1.22.0'
 
   test-specified-registry-url:
-    runs-on: '${{ matrix.os }}-latest'
+    runs-on: "${{ matrix.os }}-latest"
 
     strategy:
       fail-fast: false
@@ -157,7 +157,7 @@ jobs:
         os: [ubuntu, macOS, windows]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: action
 
@@ -167,7 +167,7 @@ jobs:
         working-directory: ./action
       - uses: ./action
         with:
-          registry-url: 'https://some.path.here.com/lol/'
+          registry-url: "https://some.path.here.com/lol/"
 
       - run: ./action/tests/log-info.sh
       - run: ./action/tests/check-version.sh 'volta' 'current'
@@ -177,10 +177,10 @@ jobs:
       - run: ./action/tests/check-registry.sh 'https://some.path.here.com/lol/'
 
   test-specific-variant:
-    runs-on: 'ubuntu-latest'
+    runs-on: "ubuntu-latest"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: action
 
@@ -200,17 +200,17 @@ jobs:
       - run: ./action/tests/check-version.sh 'yarn' '1.19.1'
 
   test-js-project-in-subdir-no-options:
-    runs-on: 'ubuntu-latest'
+    runs-on: "ubuntu-latest"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: action
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          ref: 'branch-for-testing-overriding-pinned-projects-in-ci'
-          path: 'js-stuff'
+          ref: "branch-for-testing-overriding-pinned-projects-in-ci"
+          path: "js-stuff"
 
       - run: npm ci
         working-directory: ./action
@@ -226,17 +226,17 @@ jobs:
         working-directory: ./js-stuff
 
   test-js-project-in-subdir-with-overrides:
-    runs-on: 'ubuntu-latest'
+    runs-on: "ubuntu-latest"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: action
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          ref: 'branch-for-testing-overriding-pinned-projects-in-ci'
-          path: 'js-stuff'
+          ref: "branch-for-testing-overriding-pinned-projects-in-ci"
+          path: "js-stuff"
 
       - run: npm ci
         working-directory: ./action
@@ -244,7 +244,7 @@ jobs:
         working-directory: ./action
       - uses: ./action
         with:
-          package-json-path: 'js-stuff/package.json'
+          package-json-path: "js-stuff/package.json"
           node-version: 12.14.0
           npm-version: 7.5.2
           yarn-version: 1.22.0
