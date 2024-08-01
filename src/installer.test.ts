@@ -93,6 +93,59 @@ describe('buildDownloadUrl', () => {
       ).rejects.toThrowErrorMatchingInlineSnapshot(`"your platform aix is not yet supported"`);
     });
   });
+
+  describe('volta@2.0.0', function () {
+    test('darwin - x64', async function () {
+      expect(await buildDownloadUrl('darwin', 'x64', '2.0.0')).toMatchInlineSnapshot(
+        `"https://github.com/volta-cli/volta/releases/download/v2.0.0/volta-2.0.0-macos.tar.gz"`
+      );
+    });
+
+    test('darwin - arm64', async function () {
+      expect(await buildDownloadUrl('darwin', 'arm64', '2.0.0')).toMatchInlineSnapshot(
+        `"https://github.com/volta-cli/volta/releases/download/v2.0.0/volta-2.0.0-macos.tar.gz"`
+      );
+    });
+
+    test('linux - x64', async function () {
+      expect(await buildDownloadUrl('linux', 'x64', '2.0.0')).toMatchInlineSnapshot(
+        `"https://github.com/volta-cli/volta/releases/download/v2.0.0/volta-2.0.0-linux.tar.gz"`
+      );
+    });
+
+    test('linux - arm64', async function () {
+      expect(await buildDownloadUrl('linux', 'arm64', '2.0.0')).toMatchInlineSnapshot(
+        `"https://github.com/volta-cli/volta/releases/download/v2.0.0/volta-2.0.0-linux-arm.tar.gz"`
+      );
+    });
+
+    test('linux with variant input', async function () {
+      expect(
+        await buildDownloadUrl('linux', 'x64', '1.1.0', 'linux-openssl-rhel')
+      ).toMatchInlineSnapshot(
+        `"https://github.com/volta-cli/volta/releases/download/v1.1.0/volta-1.1.0-linux-openssl-rhel.tar.gz"`
+      );
+    });
+
+    test('win32 - x64', async function () {
+      expect(await buildDownloadUrl('win32', 'x86-64', '2.0.0')).toMatchInlineSnapshot(
+        `"https://github.com/volta-cli/volta/releases/download/v2.0.0/volta-2.0.0-windows-x86_64.msi"`
+      );
+    });
+
+    test('win32 - arm64', async function () {
+      expect(await buildDownloadUrl('win32', 'arm64', '2.0.0')).toMatchInlineSnapshot(
+        `"https://github.com/volta-cli/volta/releases/download/v2.0.0/volta-2.0.0-windows-arm64.msi"`
+      );
+    });
+
+    test('aix', async function () {
+      expect(
+        async () =>
+          await buildDownloadUrl('aix', 'hmm, wat?? (I dont know a valid arch for aix)', '2.0.0')
+      ).rejects.toThrowErrorMatchingInlineSnapshot(`"your platform aix is not yet supported"`);
+    });
+  });
 });
 
 describe('getOpenSSLVersion', () => {
