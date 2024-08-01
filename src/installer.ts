@@ -113,6 +113,7 @@ export async function buildDownloadUrl(
   let fileName = '';
 
   const isOpenSSLDependent = semver.lt(version, '1.1.0');
+  const isVolta1 = semver.lt(version, '2.0.0');
 
   if (variant) {
     fileName = `volta-${version}-${variant}.tar.gz`;
@@ -134,7 +135,7 @@ export async function buildDownloadUrl(
       default:
         throw new Error(`your platform ${platform} is not yet supported`);
     }
-  } else {
+  } else if (isVolta1) {
     switch (platform) {
       case 'darwin':
         fileName = `volta-${version}-macos${arch === 'arm64' ? '-aarch64' : ''}.tar.gz`;
@@ -146,6 +147,23 @@ export async function buildDownloadUrl(
       case 'win32':
         fileName = `volta-${version}-windows-x86_64.msi`;
         break;
+      default:
+        throw new Error(`your platform ${platform} is not yet supported`);
+    }
+  } else {
+    switch (platform) {
+      case 'darwin': {
+        fileName = `volta-${version}-macos.tar.gz`;
+        break;
+      }
+      case 'linux': {
+        fileName = `volta-${version}-linux${arch === 'arm64' ? '-arm' : ''}.tar.gz`;
+        break;
+      }
+      case 'win32': {
+        fileName = `volta-${version}-windows-${arch === 'arm64' ? 'arm64' : 'x86_64'}.msi`;
+        break;
+      }
       default:
         throw new Error(`your platform ${platform} is not yet supported`);
     }
