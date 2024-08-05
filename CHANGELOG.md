@@ -10,6 +10,16 @@
 
 
 
+
+## v4.2.0 (2024-08-05)
+
+#### :rocket: Enhancement
+* [#151](https://github.com/volta-cli/action/pull/151) Add support for Volta 2.0.0 ([@charlespierce](https://github.com/charlespierce))
+
+#### Committers: 1
+- Charles Pierce ([@charlespierce](https://github.com/charlespierce))
+
+
 ## v4.1.1 (2024-03-14)
 
 #### :house: Internal

@@ -23186,7 +23186,7 @@ async function buildDownloadUrl(platform, arch, version, variant = '', openSSLVe
                 break;
             }
             case 'win32': {
-                fileName = `volta-${version}-windows-${arch === 'arm64' ? 'arm64' : '-x86_64'}.msi`;
+                fileName = `volta-${version}-windows-${arch === 'arm64' ? 'arm64' : 'x86_64'}.msi`;
                 break;
             }
             default:
