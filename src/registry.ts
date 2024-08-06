@@ -45,7 +45,7 @@ export async function writeRegistryToFile(
         newContents += line + os.EOL;
       }
     });
-  } catch (_) {
+  } catch {
     // do nothing...
   }
 
