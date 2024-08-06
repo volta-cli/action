@@ -58,7 +58,7 @@
     "semver": "^7.6.3",
     "typescript": "^5.0.4",
     "uuid": "^10.0.0",
-    "vitest": "^0.31.1"
+    "vitest": "^2.0.5"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
