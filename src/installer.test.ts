@@ -49,7 +49,9 @@ describe('buildDownloadUrl', () => {
       expect(
         async () =>
           await buildDownloadUrl('aix', 'hmm, wat?? (I dont know a valid arch for aix)', '1.0.0')
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"your platform aix is not yet supported"`);
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `[Error: your platform aix is not yet supported]`
+      );
     });
   });
 
@@ -90,7 +92,9 @@ describe('buildDownloadUrl', () => {
       expect(
         async () =>
           await buildDownloadUrl('aix', 'hmm, wat?? (I dont know a valid arch for aix)', '1.1.0')
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"your platform aix is not yet supported"`);
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `[Error: your platform aix is not yet supported]`
+      );
     });
   });
 
@@ -143,7 +147,9 @@ describe('buildDownloadUrl', () => {
       expect(
         async () =>
           await buildDownloadUrl('aix', 'hmm, wat?? (I dont know a valid arch for aix)', '2.0.0')
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"your platform aix is not yet supported"`);
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `[Error: your platform aix is not yet supported]`
+      );
     });
   });
 });
@@ -233,7 +239,7 @@ describe('getVoltaVersion', function () {
     expect(
       async () => await getVoltaVersion('0.6.5', 'some-token')
     ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"volta-cli/action: Volta version must be >= 1.0.0 (you specified 0.6.5)"`
+      `[Error: volta-cli/action: Volta version must be >= 1.0.0 (you specified 0.6.5)]`
     );
   });
 
