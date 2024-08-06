@@ -11,6 +11,19 @@
 
 
 
+
+## v4.2.1 (2024-08-06)
+
+#### :house: Internal
+* [#156](https://github.com/volta-cli/action/pull/156) Re-roll package-lock.json ([@rwjblue](https://github.com/rwjblue))
+* [#155](https://github.com/volta-cli/action/pull/155) Update various dependencies to latest ([@rwjblue](https://github.com/rwjblue))
+* [#153](https://github.com/volta-cli/action/pull/153) Update linting related dependencies to latest ([@rwjblue](https://github.com/rwjblue))
+* [#152](https://github.com/volta-cli/action/pull/152) Update in-range dependencies to latest ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v4.2.0 (2024-08-05)
 
 #### :rocket: Enhancement
