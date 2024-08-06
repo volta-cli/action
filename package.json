@@ -44,7 +44,7 @@
     "@typescript-eslint/eslint-plugin": "^8.0.1",
     "@typescript-eslint/parser": "^8.0.1",
     "@vercel/ncc": "^0.36.1",
-    "action-docs": "^1.2.0",
+    "action-docs": "^2.4.2",
     "broccoli-test-helper": "^2.0.0",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^9.1.0",

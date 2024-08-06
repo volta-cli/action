@@ -9,22 +9,22 @@ This action installs [volta](https://volta.sh) by:
 - downloading and caching volta (adding it to your $PATH)
 - optionally downloading and caching a version of node - npm by version spec and add to PATH
 
-<!-- action-docs-inputs -->
+<!-- action-docs-inputs action="action.yml" -->
 ## Inputs
 
-| parameter | description | required | default |
+| name | description | required | default |
 | --- | --- | --- | --- |
-| volta-version | Version of `volta` to fetch and setup. Examples: 0.6.0, 10.15.1, >=10.15.0 | `false` |  |
-| node-version | Version Spec of the node version to use.  Examples: 10.6.x, 10.15.1, >=10.15.0 | `false` |  |
-| npm-version | Version Spec of the npm version to use.  Examples: 7.5.x, 7.5.3, >=7.5.3 | `false` |  |
-| yarn-version | Version Spec of the yarn version to use.  Examples: 1.6.x, 10.15.1, >=10.15.0 | `false` |  |
-| package-json-path | The path to the package.json to update when using an explicit `node-version` | `yarn-version` | `npm-version` override. By default, we will use `package.json` in the checkout root. | `false` |  |
-| variant | Specific variant to install. Example: providing the variant "linux-openssl-rhel", which will target installing the volta-${version}-linux-openssl-rhel.tar.gz tarball | `false` |  |
-| registry-url | Optional registry to set up for auth. Will set the registry in a project level .npmrc file, and set up auth to read in from env.NODE_AUTH_TOKEN | `false` |  |
-| scope | Optional scope for authenticating against scoped registries. Will fall back to the repository owner when using the GitHub Packages registry (https://npm.pkg.github.com/). | `false` |  |
-| token | Used to avoid low rate limiting for cached tool downloads.  Since there's a default, this is typically not supplied by the user. | `false` | ${{ github.token }} |
-| always-auth | Set always-auth in npmrc | `false` | false |
-<!-- action-docs-inputs -->
+| `volta-version` | <p>Version of <code>volta</code> to fetch and setup. Examples: 0.6.0, 10.15.1, &gt;=10.15.0</p> | `false` | `""` |
+| `node-version` | <p>Version Spec of the node version to use.  Examples: 10.6.x, 10.15.1, &gt;=10.15.0</p> | `false` | `""` |
+| `npm-version` | <p>Version Spec of the npm version to use.  Examples: 7.5.x, 7.5.3, &gt;=7.5.3</p> | `false` | `""` |
+| `yarn-version` | <p>Version Spec of the yarn version to use.  Examples: 1.6.x, 10.15.1, &gt;=10.15.0</p> | `false` | `""` |
+| `package-json-path` | <p>The path to the package.json to update when using an explicit <code>node-version</code> | <code>yarn-version</code> | <code>npm-version</code> override. By default, we will use <code>package.json</code> in the checkout root.</p> | `false` | `""` |
+| `variant` | <p>Specific variant to install. Example: providing the variant "linux-openssl-rhel", which will target installing the volta-${version}-linux-openssl-rhel.tar.gz tarball</p> | `false` | `""` |
+| `registry-url` | <p>Optional registry to set up for auth. Will set the registry in a project level .npmrc file, and set up auth to read in from env.NODE<em>AUTH</em>TOKEN</p> | `false` | `""` |
+| `scope` | <p>Optional scope for authenticating against scoped registries. Will fall back to the repository owner when using the GitHub Packages registry (https://npm.pkg.github.com/).</p> | `false` | `""` |
+| `token` | <p>Used to avoid low rate limiting for cached tool downloads.  Since there's a default, this is typically not supplied by the user.</p> | `false` | `${{ github.token }}` |
+| `always-auth` | <p>Set always-auth in npmrc</p> | `false` | `false` |
+<!-- action-docs-inputs action="action.yml" -->
 
 ## Usage
 
