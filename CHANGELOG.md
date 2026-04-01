@@ -12,6 +12,16 @@
 
 
 
+
+## v5.0.0 (2026-04-01)
+
+#### :boom: Breaking Change
+* [#168](https://github.com/volta-cli/action/pull/168) Update to Node24 ([@Yama-Tomo](https://github.com/Yama-Tomo))
+
+#### Committers: 1
+- [@Yama-Tomo](https://github.com/Yama-Tomo)
+
+
 ## v4.2.1 (2024-08-06)
 
 #### :house: Internal
