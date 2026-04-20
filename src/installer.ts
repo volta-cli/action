@@ -236,6 +236,7 @@ async function setupShims(voltaHome: string): Promise<void> {
   setupShim(voltaHome, 'yarn');
   setupShim(voltaHome, 'npm');
   setupShim(voltaHome, 'npx');
+  setupShim(voltaHome, 'pnpm');
 }
 
 /*
@@ -253,9 +254,11 @@ export async function buildLayout(voltaHome: string): Promise<void> {
   await io.mkdirP(path.join(voltaHome, 'tools/image/node'));
   await io.mkdirP(path.join(voltaHome, 'tools/image/packages'));
   await io.mkdirP(path.join(voltaHome, 'tools/image/yarn'));
+  await io.mkdirP(path.join(voltaHome, 'tools/image/pnpm'));
   await io.mkdirP(path.join(voltaHome, 'tools/inventory/node'));
   await io.mkdirP(path.join(voltaHome, 'tools/inventory/packages'));
   await io.mkdirP(path.join(voltaHome, 'tools/inventory/yarn'));
+  await io.mkdirP(path.join(voltaHome, 'tools/inventory/pnpm'));
   await io.mkdirP(path.join(voltaHome, 'tools/user'));
   await setupShims(voltaHome);
 }
@@ -364,6 +367,11 @@ export async function installYarn(version: string): Promise<void> {
   await execVolta('.', ['install', `yarn${version === 'true' ? '' : `@${version}`}`]);
 }
 
+export async function installPnpm(version: string): Promise<void> {
+  // using `.` here because `volta install` doesn't care about the working directory at all
+  await execVolta('.', ['install', `pnpm${version === 'true' ? '' : `@${version}`}`]);
+}
+
 export async function pinNode(workingDirectory: string, version: string): Promise<void> {
   await execVolta(workingDirectory, ['pin', `node${version === 'true' ? '' : `@${version}`}`]);
 }
@@ -374,6 +382,10 @@ export async function pinNpm(workingDirectory: string, version: string): Promise
 
 export async function pinYarn(workingDirectory: string, version: string): Promise<void> {
   await execVolta(workingDirectory, ['pin', `yarn${version === 'true' ? '' : `@${version}`}`]);
+}
+
+export async function pinPnpm(workingDirectory: string, version: string): Promise<void> {
+  await execVolta(workingDirectory, ['pin', `pnpm${version === 'true' ? '' : `@${version}`}`]);
 }
 
 export async function getVoltaVersion(versionSpec: string, authToken: string): Promise<string> {

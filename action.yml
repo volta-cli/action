@@ -14,6 +14,9 @@ inputs:
   yarn-version:
     description: 'Version Spec of the yarn version to use.  Examples: 1.6.x, 10.15.1, >=10.15.0'
     default: ''
+  pnpm-version:
+    description: 'Version Spec of the pnpm version to use.  Examples: ^8, 8.15.9, >=9. ensure that the environment variable VOLTA_FEATURE_PNPM is set to 1'
+    default: ''
   package-json-path:
     description: 'The path to the package.json to update when using an explicit `node-version` | `yarn-version` | `npm-version` override. By default, we will use `package.json` in the checkout root.'
     default: ''

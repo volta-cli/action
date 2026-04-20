@@ -63,6 +63,17 @@ async function run(): Promise<void> {
       }
     }
 
+    const pnpmVersion = core.getInput('pnpm-version', { required: false });
+    if (pnpmVersion !== '') {
+      core.info(`installing Pnpm ${pnpmVersion.toUpperCase() === 'TRUE' ? '' : pnpmVersion}`);
+      await installer.installPnpm(pnpmVersion);
+
+      // cannot pin `yarn` when `node` is not pinned as well
+      if (nodeVersion !== '' && hasPackageJSON) {
+        await installer.pinPnpm(workingDirectory, pnpmVersion);
+      }
+    }
+
     const registryUrl = core.getInput('registry-url', { required: false });
     const alwaysAuth = core.getInput('always-auth', { required: false });
     if (registryUrl !== '') {

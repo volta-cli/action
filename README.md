@@ -18,6 +18,7 @@ This action installs [volta](https://volta.sh) by:
 | `node-version` | <p>Version Spec of the node version to use.  Examples: 10.6.x, 10.15.1, &gt;=10.15.0</p> | `false` | `""` |
 | `npm-version` | <p>Version Spec of the npm version to use.  Examples: 7.5.x, 7.5.3, &gt;=7.5.3</p> | `false` | `""` |
 | `yarn-version` | <p>Version Spec of the yarn version to use.  Examples: 1.6.x, 10.15.1, &gt;=10.15.0</p> | `false` | `""` |
+| `pnpm-version`      | <p>experimental. Version Spec of the pnpm version to use.  Examples: ^8, 8.15.9, &gt;=9. To enable it, ensure that the environment variable [VOLTA_FEATURE_PNPM](https://docs.volta.sh/advanced/pnpm) is set to 1</p> | `false` | `""` |
 | `package-json-path` | <p>The path to the package.json to update when using an explicit <code>node-version</code> | <code>yarn-version</code> | <code>npm-version</code> override. By default, we will use <code>package.json</code> in the checkout root.</p> | `false` | `""` |
 | `variant` | <p>Specific variant to install. Example: providing the variant "linux-openssl-rhel", which will target installing the volta-${version}-linux-openssl-rhel.tar.gz tarball</p> | `false` | `""` |
 | `registry-url` | <p>Optional registry to set up for auth. Will set the registry in a project level .npmrc file, and set up auth to read in from env.NODE<em>AUTH</em>TOKEN</p> | `false` | `""` |

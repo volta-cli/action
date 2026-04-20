@@ -186,6 +186,7 @@ describe('buildLayout', () => {
           "node": "shim-file-here",
           "npm": "shim-file-here",
           "npx": "shim-file-here",
+          "pnpm": "shim-file-here",
           "shim": "shim-file-here",
           "yarn": "shim-file-here",
         },
@@ -198,11 +199,13 @@ describe('buildLayout', () => {
           "image": {
             "node": {},
             "packages": {},
+            "pnpm": {},
             "yarn": {},
           },
           "inventory": {
             "node": {},
             "packages": {},
+            "pnpm": {},
             "yarn": {},
           },
           "user": {},
