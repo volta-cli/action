@@ -99,10 +99,6 @@ async function getLatestVoltaFromVoltaSH(): Promise<string> {
   return semver.clean(await response.readBody()) as string;
 }
 
-function voltaVersionHasSetup(version: string): boolean {
-  return semver.gte(version, '0.7.0');
-}
-
 export async function buildDownloadUrl(
   platform: string,
   arch: string,
@@ -238,28 +234,6 @@ async function setupShims(voltaHome: string): Promise<void> {
   setupShim(voltaHome, 'npx');
 }
 
-/*
- * Used to build the required folder structure when installing volta < 0.7
- */
-export async function buildLayout(voltaHome: string): Promise<void> {
-  // create the $VOLTA_HOME folder structure (volta doesn't create these
-  // folders on demand, and errors when installing node/yarn/tools if it
-  // isn't present)
-  await io.mkdirP(path.join(voltaHome, 'tmp'));
-  await io.mkdirP(path.join(voltaHome, 'bin'));
-  await io.mkdirP(path.join(voltaHome, 'cache/node'));
-  await io.mkdirP(path.join(voltaHome, 'log'));
-  await io.mkdirP(path.join(voltaHome, 'tmp'));
-  await io.mkdirP(path.join(voltaHome, 'tools/image/node'));
-  await io.mkdirP(path.join(voltaHome, 'tools/image/packages'));
-  await io.mkdirP(path.join(voltaHome, 'tools/image/yarn'));
-  await io.mkdirP(path.join(voltaHome, 'tools/inventory/node'));
-  await io.mkdirP(path.join(voltaHome, 'tools/inventory/packages'));
-  await io.mkdirP(path.join(voltaHome, 'tools/inventory/yarn'));
-  await io.mkdirP(path.join(voltaHome, 'tools/user'));
-  await setupShims(voltaHome);
-}
-
 async function acquireVolta(version: string, options: VoltaInstallOptions): Promise<string> {
   //
   // Download - a tool installer intimately knows how to get the tool (and construct urls)
@@ -313,18 +287,14 @@ async function acquireVolta(version: string, options: VoltaInstallOptions): Prom
 }
 
 async function setupVolta(version: string, voltaHome: string): Promise<void> {
-  if (voltaVersionHasSetup(version)) {
-    const executable = path.join(voltaHome, 'bin', 'volta');
-    core.info(`executing \`${executable} setup\``);
-    await exec(executable, ['setup'], {
-      env: {
-        // VOLTA_HOME needs to be set before calling volta setup
-        VOLTA_HOME: voltaHome,
-      },
-    });
-  } else {
-    await buildLayout(voltaHome);
-  }
+  const executable = path.join(voltaHome, 'bin', 'volta');
+  core.info(`executing \`${executable} setup\``);
+  await exec(executable, ['setup'], {
+    env: {
+      // VOLTA_HOME needs to be set before calling volta setup
+      VOLTA_HOME: voltaHome,
+    },
+  });
 }
 
 export async function execVolta(workingDirectory: string, specifiedArgs: string[]): Promise<void> {
